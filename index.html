@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جدولة فريق كول سنتر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F2EC;
+    --surface:#FFFFFF;
+    --ink:#1E2430;
+    --ink-soft:#6B7280;
+    --teal:#0E5C56;
+    --teal-light:#CDEAE5;
+    --coral:#FF6F59;
+    --amber:#FFB238;
+    --violet:#8B7CF6;
+    --line:#E7E2D8;
+    --danger:#E0555B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Tajawal',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .topbar{
+    background:var(--teal);
+    color:#fff;
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .topbar h1{
+    font-size:18px;
+    margin:0;
+    font-weight:900;
+  }
+  .topbar .sub{font-size:12px;opacity:.8;font-weight:400}
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:10px 16px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn-primary{background:var(--coral);color:#fff}
+  .btn-ghost{background:rgba(255,255,255,.15);color:#fff}
+  .btn-outline{background:#fff;color:var(--teal);border:1px solid var(--teal)}
+  .btn-danger{background:var(--danger);color:#fff}
+  .btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
+  .wrap{max-width:920px;margin:0 auto;padding:18px;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:16px;
+  }
+  .card h2{margin:0 0 12px;font-size:16px;color:var(--teal);}
+  label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px;color:var(--ink-soft)}
+  input[type=text],input[type=password],input[type=date],input[type=time],textarea,select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-family:inherit;
+    font-size:14px;
+    background:#FBFAF7;
+  }
+  textarea{min-height:70px;resize:vertical}
+  .emp-row{
+    display:grid;
+    grid-template-columns:1fr 2fr 1fr 2fr auto;
+    gap:8px;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .emp-row input,.emp-row select{padding:8px}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(20,20,20,.5);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;
+    overflow:auto;
+  }
+  .modal{background:#fff;border-radius:16px;padding:22px;max-width:340px;width:100%;text-align:center}
+  .modal input[type=password]{text-align:center;font-size:20px;letter-spacing:4px;margin:12px 0}
+  .day-block{margin-bottom:18px}
+  .day-title{font-weight:900;color:var(--teal);margin-bottom:8px;font-size:14px}
+  .shift-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .shift-card{
+    border-radius:12px;padding:10px 12px;color:#1E2430;
+    border:1px solid rgba(0,0,0,.06);
+  }
+  .shift-card .time{font-weight:900;font-size:13px}
+  .shift-card .who{font-size:13px;margin-top:4px;font-weight:700}
+  .shift-card .note{font-size:11px;color:#4b4b4b;margin-top:2px}
+  .shift-card.open{border:1.5px dashed #9CA3AF;background:#F3F4F6}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#fff;margin-inline-start:6px}
+  .empty{
+    text-align:center;padding:40px 16px;color:var(--ink-soft);
+  }
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .name-pick{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{
+    padding:8px 14px;border-radius:20px;border:1px solid var(--line);
+    background:#FBFAF7;cursor:pointer;font-weight:700;font-size:13px;
+  }
+  .chip.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .status{font-size:12px;color:var(--ink-soft);margin-top:6px}
+  .loading{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-inline-end:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+  .pencil-btn{
+    position:absolute;top:6px;left:6px;padding:2px 6px;background:#fff;
+    border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:12px;line-height:1.4;
+  }
+  .day-title-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .day-pencil{
+    border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;
+    cursor:pointer;font-size:13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>جدولة فريق الكول سنتر 🎧</h1>
+    <div class="sub" id="periodLabel">لا يوجد جدول بعد</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="refreshBtn">تحديث ⟳</button>
+    <button class="btn btn-ghost" id="settingsBtn">الإعدادات 🔒</button>
+    <button class="btn btn-ghost" id="shiftEditBtn">تعديل 🔒</button>
+  </div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ---------- Supabase setup ----------
+const SUPABASE_URL = 'https://uxuxqmwpsokylsyndjcx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dXhxbXdwc29reWxzeW5kamN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MDgzMzUsImV4cCI6MjEwMjQ4NDMzNX0.KTXgsjAkbfEAxx1_Dr1E5Jjs0Y5N8enoVNcccasARvk';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function getValue(key){
+  const { data, error } = await sb.from('app_data').select('value').eq('key', key).maybeSingle();
+  if(error) throw error;
+  return data ? data.value : null;
+}
+async function setValue(key, value){
+  const { error } = await sb.from('app_data').upsert({ key, value }, { onConflict: 'key' });
+  if(error) throw error;
+  return true;
+}
+
+const STORAGE_KEYS = { settings: 'scheduler:settings', schedule: 'scheduler:schedule' };
+const ACCESS_PASSWORD = '0123';
+
+let state = {
+  settingsMode: false,
+  shiftEditMode: false,
+  settings: null,
+  schedule: null,
+  selectedEmployeeId: null,
+  swapMode: false,
+  generating: false,
+  saving: false,
+  error: null,
+  successMsg: null,
+  dirty: false,
+};
+
+function emptySettings(){
+  return {
+    employees: [],
+    generalNotes: '',
+    generalConditions: '',
+    breakNotes: '',
+    startDate: '',
+    endDate: ''
+  };
+}
+
+async function loadAll(){
+  try{
+    const s = await getValue(STORAGE_KEYS.settings);
+    state.settings = s ? s : emptySettings();
+  }catch(e){ state.settings = emptySettings(); state.error = 'تعذّر الاتصال بقاعدة البيانات: ' + e.message; }
+  try{
+    const sc = await getValue(STORAGE_KEYS.schedule);
+    state.schedule = sc ? sc : null;
+  }catch(e){ state.schedule = null; }
+  render();
+}
+
+async function saveSettings(){
+  try{
+    await setValue(STORAGE_KEYS.settings, state.settings);
+  }catch(e){
+    throw new Error('لم يتم حفظ الإعدادات، حاول مرة أخرى (' + e.message + ')');
+  }
+}
+async function saveSchedule(){
+  try{
+    await setValue(STORAGE_KEYS.schedule, state.schedule);
+  }catch(e){
+    throw new Error('لم يتم حفظ الجدول، حاول مرة أخرى (' + e.message + ')');
+  }
+}
+
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function markDirty(){ state.dirty = true; }
+
+// ---------- Mode gates (settings / shift edit) ----------
+document.getElementById('settingsBtn').addEventListener('click', ()=>{
+  if(state.settingsMode){ state.settingsMode = false; render(); return; }
+  showPasswordModal(()=>{
+    state.settingsMode = true;
+    state.shiftEditMode = false;
+  });
+});
+document.getElementById('shiftEditBtn').addEventListener('click', ()=>{
+  if(state.shiftEditMode){ state.shiftEditMode = false; render(); return; }
+  showPasswordModal(()=>{
+    state.shiftEditMode = true;
+    state.settingsMode = false;
+  });
+});
+document.getElementById('refreshBtn').addEventListener('click', ()=>{
+  if(state.settingsMode && state.dirty){
+    showConfirmModal('انت بوضع الإعدادات وعندك تغييرات غير محفوظة. الضغط على تحديث سيلغيها. هل تريد المتابعة؟', loadAll);
+    return;
+  }
+  loadAll();
+});
+
+function showPasswordModal(onSuccess){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <div style="font-weight:900;font-size:16px;color:var(--teal)">كلمة المرور</div>
+      <input type="password" id="pwInput" maxlength="4" placeholder="••••" />
+      <div id="pwErr" style="color:var(--danger);font-size:12px;min-height:16px"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-outline" style="flex:1" id="pwCancel">إلغاء</button>
+        <button class="btn btn-primary" style="flex:1" id="pwOk">دخول</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  const input = bg.querySelector('#pwInput');
+  input.focus();
+  const tryEnter = ()=>{
+    if(input.value === ACCESS_PASSWORD){
+      bg.remove();
+      onSuccess();
+      render();
+    } else {
+      bg.querySelector('#pwErr').textContent = 'كلمة المرور غير صحيحة';
+    }
+  };
+  bg.querySelector('#pwOk').addEventListener('click', tryEnter);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryEnter(); });
+  bg.querySelector('#pwCancel').addEventListener('click', ()=>bg.remove());
+}
+
+// ---------- Rendering ----------
+function render(){
+  const app = document.getElementById('app');
+  const label = document.getElementById('periodLabel');
+  if(state.schedule && state.schedule.period){
+    label.textContent = `الفترة: ${state.schedule.period.start} → ${state.schedule.period.end}`;
+  } else {
+    label.textContent = 'لا يوجد جدول بعد — استخدم الإعدادات لإنشاء واحد';
+  }
+  document.getElementById('settingsBtn').textContent = state.settingsMode ? 'الخروج من الإعدادات 🔓' : 'الإعدادات 🔒';
+  document.getElementById('shiftEditBtn').textContent = state.shiftEditMode ? 'إنهاء التعديل 🔓' : 'تعديل 🔒';
+
+  app.innerHTML = '';
+  if(state.settingsMode){
+    app.appendChild(renderAdmin());
+  } else if(state.shiftEditMode){
+    app.appendChild(renderShiftEditor());
+  } else {
+    app.appendChild(renderEmployeeView());
+  }
+}
+
+// ---------- Admin panel (settings) ----------
+function renderAdmin(){
+  const el = document.createElement('div');
+
+  if(state.dirty){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#FFF3CD;border:1px solid #FFE08A;color:#7A5B00;padding:10px 14px;border-radius:10px;margin-bottom:12px;font-weight:700;font-size:13px';
+    banner.textContent = '⚠️ لديك تعديلات غير محفوظة — اضغط "حفظ الإعدادات" قبل مغادرة الصفحة أو الضغط على تحديث';
+    el.appendChild(banner);
+  }
+
+  // Employees card
+  const empCard = document.createElement('div');
+  empCard.className = 'card';
+  empCard.innerHTML = `<h2>👥 قائمة الموظفين</h2>
+    <div id="empRows"></div>
+    <button class="btn btn-outline btn-sm" id="addEmpBtn">+ إضافة موظف</button>`;
+  el.appendChild(empCard);
+  const empRows = empCard.querySelector('#empRows');
+  renderEmpRows(empRows);
+  empCard.querySelector('#addEmpBtn').addEventListener('click', ()=>{
+    state.settings.employees.push({id:'', name:'', gender:'ذكر', note:''});
+    renderEmpRows(empRows);
+    markDirty();
+  });
+
+  // Notes & conditions
+  const notesCard = document.createElement('div');
+  notesCard.className = 'card';
+  notesCard.innerHTML = `
+    <h2>📝 ملاحظات وشروط عامة</h2>
+    <label>ملاحظات عامة</label>
+    <textarea id="generalNotes" placeholder="مثال: لا يفضل وضع نفس الموظف ليلتين متتاليتين...">${esc(state.settings.generalNotes)}</textarea>
+    <label>شروط عامة</label>
+    <textarea id="generalConditions" placeholder="مثال: كل شيفت 8 ساعات، أقل عدد موظفين بالشيفت 2...">${esc(state.settings.generalConditions)}</textarea>
+  `;
+  el.appendChild(notesCard);
+  notesCard.querySelector('#generalNotes').addEventListener('input', e=>{ state.settings.generalNotes = e.target.value; markDirty(); });
+  notesCard.querySelector('#generalConditions').addEventListener('input', e=>{ state.settings.generalConditions = e.target.value; markDirty(); });
+
+  // Break notes card
+  const breakCard = document.createElement('div');
+  breakCard.className = 'card';
+  breakCard.innerHTML = `
+    <h2>☕ ملاحظات البريك</h2>
+    <div class="hint">قواعد ثابتة تُطبّق دائماً على كل شيفت: بريك 15 دقيقة + بريك غداء 30 دقيقة + بريك 15 دقيقة (بمجموع ساعة واحدة يومياً لكل موظف). لا يبدأ أي بريك ضمن أول ساعة وربع (75 دقيقة) من الدوام، ولا ينتهي أي بريك ضمن آخر ساعة من الدوام، ولا يتجاوز عدد الموظفين على بريك بنفس اللحظة 25% من العاملين في تلك اللحظة.</div>
+    <label>ملاحظات إضافية عن البريك (اختياري)</label>
+    <textarea id="breakNotes" placeholder="مثال: يفضل ألا يكون بريك الغداء بعد الساعة 3 عصراً، أو أعطِ أولوية بريك الغداء بمنتصف الشيفت...">${esc(state.settings.breakNotes)}</textarea>
+  `;
+  el.appendChild(breakCard);
+  breakCard.querySelector('#breakNotes').addEventListener('input', e=>{ state.settings.breakNotes = e.target.value; markDirty(); });
+
+  // Date range
+  const dateCard = document.createElement('div');
+  dateCard.className = 'card';
+  dateCard.innerHTML = `
+    <h2>📅 الفترة الزمنية</h2>
+    <div class="row-2">
+      <div><label>من تاريخ</label><input type="date" id="startDate" value="${state.settings.startDate||''}"></div>
+      <div><label>إلى تاريخ</label><input type="date" id="endDate" value="${state.settings.endDate||''}"></div>
+    </div>`;
+  el.appendChild(dateCard);
+  dateCard.querySelector('#startDate').addEventListener('change', e=>{ state.settings.startDate = e.target.value; markDirty(); });
+  dateCard.querySelector('#endDate').addEventListener('change', e=>{ state.settings.endDate = e.target.value; markDirty(); });
+
+  // Manual JSON import fallback
+  const importCard = document.createElement('div');
+  importCard.className = 'card';
+  importCard.innerHTML = `
+    <h2>📋 استيراد جدول جاهز (بديل يدوي)</h2>
+    <div class="hint">شغّل نفس البرومبت خارج المعاينة (مثلاً بمحادثة Claude أو OpenRouter مباشرة)، والصق الرد بصيغة JSON هنا.</div>
+    <textarea id="jsonImport" placeholder='اضغط "توليد البرومبت" ليظهر هنا، انسخه واعطه لأي AI، ثم احذفه والصق رد الـ AI (JSON) هنا واضغط استيراد' style="min-height:140px;margin-top:8px;font-family:monospace;font-size:12px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline btn-sm" id="viewPromptBtn">📋 توليد البرومبت الجاهز هنا</button>
+      <button class="btn btn-primary btn-sm" id="importBtn">استيراد الجدول (JSON)</button>
+    </div>
+    <div class="status" id="importStatus"></div>
+  `;
+  el.appendChild(importCard);
+  importCard.querySelector('#viewPromptBtn').addEventListener('click', ()=>{
+    if(!state.settings.startDate || !state.settings.endDate || state.settings.employees.length===0){
+      alert('حدد الفترة الزمنية وأضف الموظفين أولاً');
+      return;
+    }
+    const { fullCopyPastePrompt } = buildPrompts(state.settings);
+    const ta = importCard.querySelector('#jsonImport');
+    ta.value = fullCopyPastePrompt;
+    ta.focus();
+    ta.select();
+    const statusEl = importCard.querySelector('#importStatus');
+    statusEl.style.color = 'var(--teal)';
+    statusEl.textContent = '✅ البرومبت جاهز بالأسفل — منسوخ ومحدد، انسخه (Ctrl+C) واعطه لأي AI. بعدها امسحه من هنا والصق رد الـ AI (JSON) واضغط استيراد.';
+  });
+  importCard.querySelector('#importBtn').addEventListener('click', async ()=>{
+    const raw = importCard.querySelector('#jsonImport').value.trim();
+    const statusEl = importCard.querySelector('#importStatus');
+    try{
+      const cleaned = raw.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+      const parsed = JSON.parse(cleaned);
+      state.schedule = normalizeScheduleFromAI(parsed, state.settings);
+      await saveSchedule();
+      statusEl.style.color = 'var(--teal)';
+      statusEl.textContent = '✅ تم استيراد الجدول بنجاح';
+      render();
+    }catch(e){
+      statusEl.style.color = 'var(--danger)';
+      statusEl.textContent = '⚠️ تعذّر قراءة JSON: ' + e.message;
+    }
+  });
+
+  // Actions
+  const actionsCard = document.createElement('div');
+  actionsCard.className = 'card';
+  actionsCard.innerHTML = `
+    <h2>💾 الحفظ</h2>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="saveBtn" ${state.saving?'disabled':''}>${state.saving?'<span class="loading"></span>جارِ الحفظ...':'حفظ الإعدادات'}</button>
+      <button class="btn btn-danger" id="clearScheduleBtn">🗑️ مسح الجدول كاملاً</button>
+    </div>
+    <div class="status" id="statusMsg" style="${state.error ? 'color:var(--danger);font-weight:700' : (state.successMsg ? 'color:var(--teal);font-weight:700' : '')}">${state.error ? '⚠️ '+esc(state.error) : (state.successMsg ? '✅ '+esc(state.successMsg) : '')}</div>
+  `;
+  el.appendChild(actionsCard);
+  actionsCard.querySelector('#saveBtn').addEventListener('click', onSaveSettings);
+  actionsCard.querySelector('#clearScheduleBtn').addEventListener('click', onClearSchedule);
+
+  return el;
+}
+
+function renderEmpRows(container){
+  container.innerHTML = '';
+  state.settings.employees.forEach((emp, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'emp-row';
+    row.innerHTML = `
+      <input type="text" placeholder="ID" value="${esc(emp.id)}" data-f="id">
+      <input type="text" placeholder="الاسم" value="${esc(emp.name)}" data-f="name">
+      <select data-f="gender">
+        <option value="ذكر" ${emp.gender==='ذكر'?'selected':''}>ذكر</option>
+        <option value="انثى" ${emp.gender==='انثى'?'selected':''}>انثى</option>
+      </select>
+      <input type="text" placeholder="ملاحظة" value="${esc(emp.note)}" data-f="note">
+      <button class="btn btn-danger btn-sm" data-del>✕</button>
+    `;
+    row.querySelectorAll('input,select').forEach(inp=>{
+      inp.addEventListener('input', e=>{
+        emp[e.target.dataset.f] = e.target.value;
+        markDirty();
+      });
+    });
+    row.querySelector('[data-del]').addEventListener('click', ()=>{
+      state.settings.employees.splice(idx,1);
+      renderEmpRows(container);
+      markDirty();
+    });
+    container.appendChild(row);
+  });
+}
+
+function showConfirmModal(message, onConfirm){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <div style="font-weight:900;font-size:16px;color:var(--danger)">تأكيد المسح</div>
+      <div style="font-size:14px;color:var(--ink);margin:14px 0;line-height:1.6">${esc(message)}</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-outline" style="flex:1" id="confirmCancel">إلغاء</button>
+        <button class="btn btn-danger" style="flex:1" id="confirmOk">تأكيد المسح</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bg);
+  bg.querySelector('#confirmCancel').addEventListener('click', ()=> bg.remove());
+  bg.querySelector('#confirmOk').addEventListener('click', ()=>{
+    bg.remove();
+    onConfirm();
+  });
+}
+
+async function onClearSchedule(){
+  showConfirmModal('هل أنت متأكد من مسح الجدول الحالي بالكامل؟ لا يمكن التراجع عن هذا الإجراء، وسيختفي الجدول لكل الموظفين فوراً.', async ()=>{
+    state.error = null; state.successMsg = null;
+    try{
+      state.schedule = null;
+      await saveSchedule();
+      state.successMsg = 'تم مسح الجدول بالكامل';
+    }catch(e){
+      state.error = 'فشل مسح الجدول: ' + e.message;
+    }
+    render();
+    if(state.successMsg){
+      setTimeout(()=>{ state.successMsg = null; render(); }, 4000);
+    }
+  });
+}
+
+async function onSaveSettings(){
+  state.saving = true; state.error = null; state.successMsg = null; render();
+  try{
+    await saveSettings();
+    state.successMsg = 'تم حفظ الإعدادات بنجاح';
+    state.dirty = false;
+  }catch(e){
+    state.error = 'فشل الحفظ: ' + e.message;
+  }
+  state.saving = false;
+  render();
+  if(state.successMsg){
+    setTimeout(()=>{ state.successMsg = null; render(); }, 4000);
+  }
+}
+
+async function onGenerateSchedule(){
+  state.error = null; state.successMsg = null;
+  if(!state.settings.apiKey || !state.settings.model){
+    state.error = 'أدخل مفتاح API واسم الموديل أولاً'; render(); return;
+  }
+  if(!state.settings.startDate || !state.settings.endDate){
+    state.error = 'حدد الفترة الزمنية أولاً'; render(); return;
+  }
+  if(state.settings.employees.length === 0){
+    state.error = 'أضف موظفين أولاً'; render(); return;
+  }
+  state.generating = true; render();
+  try{
+    await saveSettings();
+    state.dirty = false;
+    const schedule = await callOpenRouterForSchedule(state.settings);
+    state.schedule = schedule;
+    await saveSchedule();
+    state.successMsg = 'تم إنشاء الجدول بنجاح ✅';
+  }catch(e){
+    state.error = 'فشل إنشاء الجدول: ' + e.message;
+  }
+  state.generating = false;
+  render();
+  if(state.successMsg){
+    setTimeout(()=>{ state.successMsg = null; render(); }, 5000);
+  }
+}
+
+function buildPrompts(settings){
+  const empList = settings.employees.map((e,i)=>`${i+1}. id: "${e.id}" | الاسم: "${e.name}" | الجنس: ${e.gender} | ملاحظة خاصة: ${e.note||'لا يوجد'}`).join('\n');
+
+  const systemPrompt = `أنت محرك جدولة (Scheduling Engine) متخصص بجدولة موظفي كول سنتر يعمل 24 ساعة/7 أيام.
+مهمتك الوحيدة: إخراج جدول دوام كـ JSON صالح 100% يطابق الصيغة المطلوبة بالضبط، بدون أي نص، شرح، أو Markdown حول الـ JSON.
+
+قواعد صارمة يجب اتباعها:
+1. كل يوم بالفترة المطلوبة يجب أن يكون مغطى بالكامل من الساعة 00:00 إلى 24:00 بدون أي فجوة زمنية وبدون تداخل بين الشيفتات.
+2. استخدم فقط أرقام id الموظفين المُعطاة بالضبط كما وردت (لا تخترع id جديد ولا تغيّر حروفه).
+3. وزّع الشيفتات بعدالة قدر الإمكان بين كل الموظفين على مدى الفترة الكاملة (لا تحمّل موظف واحد أكثر من غيره بدون سبب من الشروط).
+4. اقرأ "ملاحظة خاصة" لكل موظف بعناية وطبّقها حرفياً (مثال: موظف ما يقدر يشتغل ليلي، أو يفضل شيفت معين).
+5. طبّق "الشروط العامة" و"الملاحظات العامة" كقواعد ملزمة على كل الجدول.
+6. إذا تعارضت الشروط العامة مع تغطية 24 ساعة الكاملة، أعطِ الأولوية لتغطية الـ 24 ساعة، وحاول تحقيق أكبر قدر ممكن من بقية الشروط.
+7. لا تترك أي شيفت بدون employeeId إلا إذا كان عدد الموظفين لا يكفي رياضياً لتغطية كل الشيفتات؛ في هذه الحالة اجعل employeeId = null لأقل عدد ممكن من الشيفتات.
+8. "label" يجب أن يكون وصفاً قصيراً وواضحاً بالعربي (مثال: "الوردية الصباحية", "الوردية الليلية").
+9. لكل شيفت له employeeId (موظف حقيقي وليس شاغراً)، أضف مصفوفة "breaks" فيها 3 بريكات بالضبط لهذا الموظف بمجموع ساعة واحدة: بريك أول 15 دقيقة، ثم بريك غداء 30 دقيقة، ثم بريك أخير 15 دقيقة، بالترتيب الزمني.
+10. قواعد إلزامية للبريكات:
+   - يمنع منعاً باتاً أن يبدأ أي بريك ضمن أول 75 دقيقة (ساعة وربع) من بداية الشيفت.
+   - يمنع منعاً باتاً أن ينتهي أي بريك ضمن آخر 60 دقيقة من نهاية الشيفت.
+   - وزّع أوقات البريكات بين الموظفين المختلفين بحيث لا يتجاوز عدد الموظفين الذين على بريك في نفس اللحظة 25% من عدد الموظفين العاملين فعلياً في تلك اللحظة (لا تجعلهم كلهم يأخذون الغداء بنفس الساعة مثلاً).
+   - الشيفتات بدون موظف (employeeId = null) لا تحتاج breaks؛ اجعلها مصفوفة فارغة [].
+11. أعد الرد بصيغة JSON فقط، تبدأ مباشرة بـ { وتنتهي بـ }، بدون \`\`\`json وبدون أي كلام قبل أو بعد، وبدون أي تعليق أو تفسير خارج الـ JSON.
+
+صيغة الإخراج المطلوبة بالضبط:
+{
+  "days": [
+    {
+      "date": "YYYY-MM-DD",
+      "shifts": [
+        {"start":"00:00","end":"08:00","label":"الوردية الليلية","employeeId":"ID_من_القائمة",
+          "breaks":[
+            {"label":"بريك 1","start":"01:30","end":"01:45"},
+            {"label":"الغداء","start":"03:30","end":"04:00"},
+            {"label":"بريك 2","start":"06:00","end":"06:15"}
+          ]
+        },
+        {"start":"08:00","end":"16:00","label":"الوردية الصباحية","employeeId":"ID_من_القائمة","breaks":[]},
+        {"start":"16:00","end":"24:00","label":"الوردية المسائية","employeeId":null,"breaks":[]}
+      ]
+    }
+  ]
+}`;
+
+  const userPrompt = `أنشئ جدول دوام كامل لكل يوم من ${settings.startDate} إلى ${settings.endDate} شامل الطرفين.
+
+عدد الموظفين: ${settings.employees.length}
+
+قائمة الموظفين الكاملة (استخدم فقط هذه الـ id بالضبط):
+${empList}
+
+الملاحظات العامة (تخص كل الفريق): ${settings.generalNotes || 'لا يوجد'}
+
+الشروط العامة (تخص كل الفريق): ${settings.generalConditions || 'لا يوجد (افتراضياً: شيفتات 8 ساعات، موظف واحد لكل شيفت)'}
+
+ملاحظات البريك (بالإضافة للقواعد الإلزامية المذكورة في التعليمات): ${settings.breakNotes || 'لا يوجد'}
+
+أعد فقط كائن JSON بالصيغة المحددة أعلاه، يغطي كل الأيام المطلوبة من ${settings.startDate} إلى ${settings.endDate}، ولا تنسَ مصفوفة breaks لكل شيفت فيه موظف حقيقي.`;
+
+  const fullCopyPastePrompt = systemPrompt + '\n\n---\n\n' + userPrompt;
+
+  return { systemPrompt, userPrompt, fullCopyPastePrompt };
+}
+
+function normalizeScheduleFromAI(parsed, settings){
+  const days = (parsed.days||[]).map(d=>({
+    date: d.date,
+    shifts: (d.shifts||[]).map(s=>({
+      shiftId: uid('sh'),
+      start: s.start, end: s.end, label: s.label||'',
+      employeeId: s.employeeId || null,
+      breaks: (s.breaks||[]).map(b=>({
+        breakId: uid('brk'),
+        label: b.label||'',
+        start: b.start, end: b.end
+      }))
+    }))
+  }));
+  return {
+    generatedAt: new Date().toISOString(),
+    period: { start: settings.startDate, end: settings.endDate },
+    days
+  };
+}
+
+async function callOpenRouterForSchedule(settings){
+  const { systemPrompt, userPrompt } = buildPrompts(settings);
+
+  const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + settings.apiKey,
+    },
+    body: JSON.stringify({
+      model: settings.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+    })
+  });
+  if(!resp.ok){
+    const t = await resp.text();
+    throw new Error('استجابة غير ناجحة من OpenRouter: ' + resp.status + ' ' + t.slice(0,200));
+  }
+  const data = await resp.json();
+  let text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  if(!text) throw new Error('لم يصل نص من النموذج');
+  text = text.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  let parsed;
+  try{ parsed = JSON.parse(text); }
+  catch(e){ throw new Error('تعذّر تحليل الرد كـ JSON'); }
+  return normalizeScheduleFromAI(parsed, settings);
+}
+
+// ---------- Time & break helpers ----------
+function timeToMinutes(t){
+  if(!t) return null;
+  const [h,m] = t.split(':').map(Number);
+  return h*60 + m;
+}
+function breakDurationMinutes(b){
+  let s = timeToMinutes(b.start), e = timeToMinutes(b.end);
+  if(s==null || e==null) return 0;
+  if(e <= s) e += 1440;
+  return e - s;
+}
+// Checks the "not in first 75min" / "not in last 60min" rules for one break vs its shift
+function validateBreakAgainstShift(shift, brk){
+  const warnings = [];
+  if(!brk.start || !brk.end) return warnings;
+  let shiftStart = timeToMinutes(shift.start), shiftEnd = timeToMinutes(shift.end);
+  if(shiftEnd <= shiftStart) shiftEnd += 1440;
+  let bStart = timeToMinutes(brk.start), bEnd = timeToMinutes(brk.end);
+  if(bStart < shiftStart) bStart += 1440;
+  if(bEnd <= bStart) bEnd += 1440;
+  if(bStart - shiftStart < 75){
+    warnings.push('يبدأ ضمن أول ساعة وربع من الدوام');
+  }
+  if(shiftEnd - bEnd < 60){
+    warnings.push('ينتهي ضمن آخر ساعة من الدوام');
+  }
+  return warnings;
+}
+// Soft check: are more than 25% of employees working at this break's start time also on break?
+function concurrencyWarning(day, currentShiftId, brk){
+  if(!brk.start || !brk.end) return null;
+  const t = timeToMinutes(brk.start);
+  let working = 0, onBreak = 0, currentIsWorking = false;
+  day.shifts.forEach(s=>{
+    if(!s.employeeId) return;
+    let ss = timeToMinutes(s.start), se = timeToMinutes(s.end);
+    if(se <= ss) se += 1440;
+    let tt = t; if(tt < ss) tt += 1440;
+    if(!(tt >= ss && tt < se)) return;
+    working++;
+    if(s.shiftId === currentShiftId){ currentIsWorking = true; return; }
+    (s.breaks||[]).forEach(b=>{
+      if(!b.start || !b.end) return;
+      let bs = timeToMinutes(b.start), be = timeToMinutes(b.end);
+      if(be <= bs) be += 1440;
+      let tt2 = t; if(tt2 < bs) tt2 += 1440;
+      if(tt2 >= bs && tt2 < be) onBreak++;
+    });
+  });
+  if(currentIsWorking) onBreak++; // this break itself
+  if(working > 0 && (onBreak/working) > 0.25){
+    return `أكثر من 25% من العاملين وقت ${brk.start} سيكونون على بريك (${onBreak} من ${working})`;
+  }
+  return null;
+}
+
+// ---------- Employee view ----------
+function empById(id){
+  return (state.settings.employees||[]).find(e=>e.id===id);
+}
+
+const SHIFT_COLORS = ['#CDEAE5','#FFE3C2','#E6DEFB','#FFD6D0','#D6ECFF'];
+function colorForLabel(label){
+  let h=0; for(const c of (label||'')) h = (h*31 + c.charCodeAt(0))>>>0;
+  return SHIFT_COLORS[h % SHIFT_COLORS.length];
+}
+
+function renderEmployeeView(){
+  const el = document.createElement('div');
+
+  if(!state.schedule || !state.schedule.days || state.schedule.days.length===0){
+    el.innerHTML = `<div class="card empty">لا يوجد جدول منشور حالياً 🗓️<br><span style="font-size:12px">راجع مسؤول الفريق لإنشاء الجدول</span></div>`;
+    return el;
+  }
+
+  // Employee picker
+  const pickCard = document.createElement('div');
+  pickCard.className = 'card';
+  pickCard.innerHTML = `<h2>من أنت؟</h2><div class="name-pick" id="namePick"></div>`;
+  el.appendChild(pickCard);
+  const namePick = pickCard.querySelector('#namePick');
+  state.settings.employees.forEach(emp=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.selectedEmployeeId===emp.id ? ' active':'');
+    chip.textContent = emp.name || emp.id;
+    chip.addEventListener('click', ()=>{
+      state.selectedEmployeeId = (state.selectedEmployeeId===emp.id) ? null : emp.id;
+      state.swapMode = false;
+      render();
+    });
+    namePick.appendChild(chip);
+  });
+
+  if(state.selectedEmployeeId){
+    const swapBtn = document.createElement('button');
+    swapBtn.className = 'btn btn-outline btn-sm';
+    swapBtn.style.marginTop='10px';
+    swapBtn.textContent = state.swapMode ? 'إنهاء تعديل الشيفتات' : 'تغيير شيفتي 🔁';
+    swapBtn.addEventListener('click', ()=>{ state.swapMode = !state.swapMode; render(); });
+    pickCard.appendChild(swapBtn);
+  }
+
+  // Legend
+  const legendCard = document.createElement('div');
+  legendCard.innerHTML = `<div class="legend"><span><i style="background:#CDEAE5"></i>شيفتات</span><span><i style="background:#F3F4F6;border:1px dashed #9CA3AF"></i>شيفت متاح (بدون موظف)</span></div>`;
+  el.appendChild(legendCard);
+
+  // Schedule days
+  state.schedule.days.forEach(day=>{
+    const dayEl = document.createElement('div');
+    dayEl.className = 'day-block';
+    const dateFmt = new Date(day.date).toLocaleDateString('ar-EG', { weekday:'long', month:'short', day:'numeric' });
+    dayEl.innerHTML = `<div class="day-title">${dateFmt}</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'shift-grid';
+
+    let shiftsToShow = day.shifts;
+    if(state.selectedEmployeeId && state.swapMode){
+      // show own shifts (with remove) + open shifts (with take)
+      shiftsToShow = day.shifts.filter(s => s.employeeId === state.selectedEmployeeId || !s.employeeId);
+    } else if(state.selectedEmployeeId && !state.swapMode){
+      shiftsToShow = day.shifts.filter(s => s.employeeId === state.selectedEmployeeId);
+      if(shiftsToShow.length===0) return; // skip days with nothing for this person in normal view
+    }
+
+    shiftsToShow.forEach(s=>{
+      const card = document.createElement('div');
+      const emp = s.employeeId ? empById(s.employeeId) : null;
+      card.className = 'shift-card' + (!s.employeeId ? ' open' : '');
+      card.style.background = s.employeeId ? colorForLabel(s.label) : '';
+      card.style.cursor = 'pointer';
+      card.innerHTML = `
+        <div class="time">${s.start} - ${s.end}</div>
+        <div class="who">${emp ? emp.name : (s.employeeId ? s.employeeId : 'شاغر')}</div>
+        ${s.label ? `<div class="note">${esc(s.label)}</div>` : ''}
+        ${ (s.breaks && s.breaks.length) ? `<div class="note">☕ ${s.breaks.length} بريك</div>` : '' }
+      `;
+      card.addEventListener('click', ()=> showShiftDetailsModal(s));
+      if(state.swapMode && state.selectedEmployeeId){
+        const actionBtn = document.createElement('button');
+        actionBtn.className = 'btn btn-sm';
+        actionBtn.style.marginTop='8px';
+        if(s.employeeId === state.selectedEmployeeId){
+          actionBtn.textContent = 'ترك هذا الشيفت';
+          actionBtn.style.background = 'var(--danger)'; actionBtn.style.color='#fff';
+          actionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); updateShift(s.shiftId, null); });
+        } else if(!s.employeeId){
+          actionBtn.textContent = 'أخذ هذا الشيفت';
+          actionBtn.style.background = 'var(--teal)'; actionBtn.style.color='#fff';
+          actionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); updateShift(s.shiftId, state.selectedEmployeeId); });
+        }
+        card.appendChild(actionBtn);
+      }
+      grid.appendChild(card);
+    });
+    dayEl.appendChild(grid);
+    el.appendChild(dayEl);
+  });
+
+  return el;
+}
+
+async function updateShift(shiftId, newEmployeeId){
+  // reload fresh schedule first to avoid overwriting others' concurrent changes
+  try{
+    const sc = await getValue(STORAGE_KEYS.schedule);
+    if(sc) state.schedule = sc;
+  }catch(e){}
+  for(const day of state.schedule.days){
+    for(const s of day.shifts){
+      if(s.shiftId === shiftId){ s.employeeId = newEmployeeId; }
+    }
+  }
+  await saveSchedule();
+  render();
+}
+
+function showShiftDetailsModal(shift){
+  const emp = shift.employeeId ? empById(shift.employeeId) : null;
+  const breaks = shift.breaks || [];
+  const totalBreakMin = breaks.reduce((sum,b)=> sum + breakDurationMinutes(b), 0);
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal" style="max-width:360px;text-align:right">
+      <div style="font-weight:900;font-size:16px;color:var(--teal);text-align:center;margin-bottom:10px">تفاصيل الشيفت</div>
+      <div style="font-size:14px;line-height:1.9">
+        <div><b>الوقت:</b> ${esc(shift.start)} - ${esc(shift.end)}</div>
+        ${shift.label ? `<div><b>الوصف:</b> ${esc(shift.label)}</div>` : ''}
+        <div><b>الموظف:</b> ${emp ? esc(emp.name) : (shift.employeeId ? esc(shift.employeeId) : 'شاغر')}</div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+      <div style="font-weight:700;font-size:13px;margin-bottom:6px">☕ البريكات (الاستراحات)</div>
+      ${breaks.length===0
+        ? '<div class="hint">لا توجد بريكات مسجّلة لهذا الشيفت</div>'
+        : `<div>${breaks.map(b=>`
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px">
+              <span>${esc(b.label || 'بريك')}</span>
+              <span>${esc(b.start)} - ${esc(b.end)} <span style="color:var(--ink-soft)">(${breakDurationMinutes(b)} د)</span></span>
+            </div>
+          `).join('')}
+          <div class="hint" style="margin-top:8px">إجمالي وقت البريكات: ${totalBreakMin} دقيقة</div>`
+      }
+      <button class="btn btn-outline" style="width:100%;margin-top:14px" id="detailsClose">إغلاق</button>
+    </div>`;
+  document.body.appendChild(bg);
+  bg.querySelector('#detailsClose').addEventListener('click', ()=> bg.remove());
+  bg.addEventListener('click', e=>{ if(e.target===bg) bg.remove(); });
+}
+
+// ---------- Shift editor (full edit mode: times, employee, add/remove shifts) ----------
+function renderShiftEditor(){
+  const el = document.createElement('div');
+
+  if(!state.schedule || !state.schedule.days || state.schedule.days.length===0){
+    el.innerHTML = `<div class="card empty">لا يوجد جدول لتعديله 🗓️<br><span style="font-size:12px">أنشئ جدولاً أولاً من الإعدادات</span></div>`;
+    return el;
+  }
+
+  const hint = document.createElement('div');
+  hint.className = 'card';
+  hint.innerHTML = `<div class="hint" style="margin:0">✏️ اضغط أيقونة القلم داخل أي شيفت لتعديل وقته أو الموظف المسؤول عنه، أو اضغط أيقونة القلم بجانب اسم اليوم لإضافة شيفت جديد أو حذف شيفت من ذلك اليوم.</div>`;
+  el.appendChild(hint);
+
+  state.schedule.days.forEach((day, dayIdx)=>{
+    const dayEl = document.createElement('div');
+    dayEl.className = 'day-block';
+    const dateFmt = new Date(day.date).toLocaleDateString('ar-EG', { weekday:'long', month:'short', day:'numeric' });
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'day-title-row';
+    titleRow.innerHTML = `<div class="day-title" style="margin-bottom:0">${dateFmt}</div>`;
+    const dayPencil = document.createElement('button');
+    dayPencil.className = 'day-pencil';
+    dayPencil.title = 'إضافة أو حذف شيفت لهذا اليوم';
+    dayPencil.textContent = '✏️';
+    dayPencil.addEventListener('click', ()=> showDayEditModal(dayIdx));
+    titleRow.appendChild(dayPencil);
+    dayEl.appendChild(titleRow);
+
+    const grid = document.createElement('div');
+    grid.className = 'shift-grid';
+
+    day.shifts.forEach(s=>{
+      const card = document.createElement('div');
+      const emp = s.employeeId ? empById(s.employeeId) : null;
+      card.className = 'shift-card' + (!s.employeeId ? ' open' : '');
+      card.style.background = s.employeeId ? colorForLabel(s.label) : '';
+      card.style.position = 'relative';
+      card.innerHTML = `
+        <button class="pencil-btn" title="تعديل الشيفت">✏️</button>
+        <div class="time">${s.start} - ${s.end}</div>
+        <div class="who">${emp ? emp.name : (s.employeeId ? s.employeeId : 'شاغر')}</div>
+        ${s.label ? `<div class="note">${esc(s.label)}</div>` : ''}
+        ${ (s.breaks && s.breaks.length) ? `<div class="note">☕ ${s.breaks.length} بريك (${s.breaks.reduce((sum,b)=>sum+breakDurationMinutes(b),0)} د)</div>` : '' }
+      `;
+      card.querySelector('.pencil-btn').addEventListener('click', ()=> showShiftEditModal(dayIdx, s.shiftId));
+      grid.appendChild(card);
+    });
+    dayEl.appendChild(grid);
+    el.appendChild(dayEl);
+  });
+
+  return el;
+}
+
+function employeeSelectOptions(selectedId){
+  return ['<option value="">— شاغر (بدون موظف) —</option>']
+    .concat(state.settings.employees.map(e=>
+      `<option value="${esc(e.id)}" ${selectedId===e.id?'selected':''}>${esc(e.name||e.id)}</option>`
+    )).join('');
+}
+
+function showShiftEditModal(dayIdx, shiftId){
+  const day = state.schedule.days[dayIdx];
+  const shift = day.shifts.find(s=>s.shiftId===shiftId);
+  if(!shift) return;
+
+  // work on a local draft of breaks; only committed to `shift` on Save
+  let localBreaks = (shift.breaks||[]).map(b=>({...b}));
+
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal" style="max-width:400px;text-align:right">
+      <div style="font-weight:900;font-size:16px;color:var(--teal);text-align:center;margin-bottom:6px">تعديل الشيفت</div>
+      <div class="row-2">
+        <div><label>من الساعة</label><input type="time" id="editStart" value="${esc(shift.start)}"></div>
+        <div><label>إلى الساعة</label><input type="time" id="editEnd" value="${esc(shift.end)}"></div>
+      </div>
+      <label>الوصف/التسمية</label>
+      <input type="text" id="editLabel" value="${esc(shift.label)}" placeholder="مثال: الوردية الصباحية">
+      <label>الموظف المسؤول</label>
+      <select id="editEmp">${employeeSelectOptions(shift.employeeId)}</select>
+
+      <label style="margin-top:14px">☕ البريكات (الاستراحات)</label>
+      <div id="breaksList"></div>
+      <div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" id="addBreak1">+ بريك 15 د</button>
+        <button class="btn btn-outline btn-sm" id="addBreak2">+ بريك غداء 30 د</button>
+        <button class="btn btn-outline btn-sm" id="addBreak3">+ بريك 15 د</button>
+      </div>
+      <div id="breakWarnings" style="font-size:12px"></div>
+
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn btn-outline" style="flex:1" id="editCancel">إلغاء</button>
+        <button class="btn btn-primary" style="flex:1" id="editSave">حفظ</button>
+      </div>
+      <button class="btn btn-danger btn-sm" style="width:100%;margin-top:8px" id="editDelete">🗑️ حذف هذا الشيفت</button>
+    </div>`;
+  document.body.appendChild(bg);
+
+  function currentDraftShift(){
+    return {
+      shiftId: shift.shiftId,
+      start: bg.querySelector('#editStart').value || shift.start,
+      end: bg.querySelector('#editEnd').value || shift.end
+    };
+  }
+
+  function renderWarnings(){
+    const warnEl = bg.querySelector('#breakWarnings');
+    const draft = currentDraftShift();
+    const msgs = [];
+    localBreaks.forEach((b,i)=>{
+      validateBreakAgainstShift(draft, b).forEach(w=> msgs.push(`بريك ${i+1} (${b.label||'بدون اسم'}): ${w}`));
+      const cw = concurrencyWarning(day, shift.shiftId, b);
+      if(cw) msgs.push(`بريك ${i+1} (${b.label||'بدون اسم'}): ${cw}`);
+    });
+    const totalMin = localBreaks.reduce((sum,b)=> sum + breakDurationMinutes(b), 0);
+    let html = msgs.map(m=>`<div style="color:var(--danger)">⚠️ ${esc(m)}</div>`).join('');
+    html += `<div style="color:var(--ink-soft);margin-top:4px">إجمالي وقت البريكات المضافة: ${totalMin} دقيقة (المفترض ساعة كاملة = 60 دقيقة)</div>`;
+    warnEl.innerHTML = html;
+  }
+
+  function renderBreaksList(){
+    const list = bg.querySelector('#breaksList');
+    if(localBreaks.length===0){
+      list.innerHTML = '<div class="hint">لا توجد بريكات مضافة — استخدم الأزرار بالأسفل لإضافتها</div>';
+    } else {
+      list.innerHTML = localBreaks.map((b,i)=>`
+        <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:6px">
+          <input type="text" value="${esc(b.label)}" data-bf="label" data-i="${i}" placeholder="اسم البريك">
+          <input type="time" value="${esc(b.start)}" data-bf="start" data-i="${i}">
+          <input type="time" value="${esc(b.end)}" data-bf="end" data-i="${i}">
+          <button class="btn btn-danger btn-sm" data-bdel="${i}">✕</button>
+        </div>
+      `).join('');
+      list.querySelectorAll('[data-bf]').forEach(inp=>{
+        inp.addEventListener('input', e=>{
+          const i = +e.target.dataset.i;
+          localBreaks[i][e.target.dataset.bf] = e.target.value;
+          renderWarnings();
+        });
+      });
+      list.querySelectorAll('[data-bdel]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          localBreaks.splice(+btn.dataset.bdel, 1);
+          renderBreaksList();
+        });
+      });
+    }
+    renderWarnings();
+  }
+  renderBreaksList();
+
+  function addBreak(label){
+    localBreaks.push({ breakId: uid('brk'), label, start:'', end:'' });
+    renderBreaksList();
+  }
+  bg.querySelector('#addBreak1').addEventListener('click', ()=> addBreak('بريك 1'));
+  bg.querySelector('#addBreak2').addEventListener('click', ()=> addBreak('الغداء'));
+  bg.querySelector('#addBreak3').addEventListener('click', ()=> addBreak('بريك 2'));
+
+  bg.querySelector('#editStart').addEventListener('input', renderWarnings);
+  bg.querySelector('#editEnd').addEventListener('input', renderWarnings);
+
+  bg.querySelector('#editCancel').addEventListener('click', ()=> bg.remove());
+
+  bg.querySelector('#editSave').addEventListener('click', async ()=>{
+    const start = bg.querySelector('#editStart').value;
+    const end = bg.querySelector('#editEnd').value;
+    if(!start || !end){ alert('حدد وقت البداية والنهاية'); return; }
+    shift.start = start;
+    shift.end = end;
+    shift.label = bg.querySelector('#editLabel').value;
+    shift.employeeId = bg.querySelector('#editEmp').value || null;
+    shift.breaks = localBreaks
+      .filter(b=> b.start && b.end)
+      .map(b=>({ breakId: b.breakId || uid('brk'), label: b.label||'', start: b.start, end: b.end }));
+    try{
+      await saveSchedule();
+      bg.remove();
+      render();
+    }catch(e){
+      alert('فشل الحفظ: ' + e.message);
+    }
+  });
+
+  bg.querySelector('#editDelete').addEventListener('click', async ()=>{
+    day.shifts = day.shifts.filter(s=>s.shiftId!==shiftId);
+    try{
+      await saveSchedule();
+      bg.remove();
+      render();
+    }catch(e){
+      alert('فشل الحذف: ' + e.message);
+    }
+  });
+}
+
+function showDayEditModal(dayIdx){
+  const day = state.schedule.days[dayIdx];
+  const dateFmt = new Date(day.date).toLocaleDateString('ar-EG', { weekday:'long', month:'short', day:'numeric' });
+
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal" style="max-width:400px;text-align:right">
+      <div style="font-weight:900;font-size:16px;color:var(--teal);text-align:center">تعديل شيفتات اليوم</div>
+      <div style="font-size:13px;color:var(--ink-soft);text-align:center;margin-bottom:10px">${dateFmt}</div>
+      <div id="dayShiftsList" style="max-height:220px;overflow:auto;margin-bottom:6px"></div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:10px 0">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">إضافة شيفت جديد</div>
+      <div class="row-2">
+        <div><label>من</label><input type="time" id="newStart"></div>
+        <div><label>إلى</label><input type="time" id="newEnd"></div>
+      </div>
+      <label>الوصف/التسمية</label>
+      <input type="text" id="newLabel" placeholder="مثال: الوردية الليلية">
+      <label>الموظف المسؤول</label>
+      <select id="newEmp">${employeeSelectOptions(null)}</select>
+      <div class="hint">بعد إضافة الشيفت، اضغط على أيقونة القلم ✏️ داخل بطاقته لإضافة بريكاته.</div>
+      <button class="btn btn-primary btn-sm" style="width:100%;margin-top:10px" id="addShiftBtn">+ إضافة الشيفت لهذا اليوم</button>
+      <button class="btn btn-outline" style="width:100%;margin-top:10px" id="dayEditClose">إغلاق</button>
+    </div>`;
+  document.body.appendChild(bg);
+
+  function renderList(){
+    const list = bg.querySelector('#dayShiftsList');
+    if(day.shifts.length===0){
+      list.innerHTML = '<div class="hint">لا توجد شيفتات لهذا اليوم</div>';
+      return;
+    }
+    list.innerHTML = day.shifts.map(s=>{
+      const emp = s.employeeId ? empById(s.employeeId) : null;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px">
+        <span>${esc(s.start)}-${esc(s.end)} · ${esc(emp?emp.name:(s.employeeId||'شاغر'))}${s.label?' · '+esc(s.label):''}</span>
+        <button class="btn btn-danger btn-sm" data-del="${s.shiftId}">حذف</button>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        day.shifts = day.shifts.filter(s=>s.shiftId!==btn.dataset.del);
+        try{
+          await saveSchedule();
+          renderList();
+          render();
+        }catch(e){
+          alert('فشل الحذف: ' + e.message);
+        }
+      });
+    });
+  }
+  renderList();
+
+  bg.querySelector('#addShiftBtn').addEventListener('click', async ()=>{
+    const start = bg.querySelector('#newStart').value;
+    const end = bg.querySelector('#newEnd').value;
+    const label = bg.querySelector('#newLabel').value;
+    const employeeId = bg.querySelector('#newEmp').value || null;
+    if(!start || !end){ alert('حدد وقت البداية والنهاية'); return; }
+    day.shifts.push({ shiftId: uid('sh'), start, end, label, employeeId, breaks: [] });
+    try{
+      await saveSchedule();
+      bg.querySelector('#newStart').value='';
+      bg.querySelector('#newEnd').value='';
+      bg.querySelector('#newLabel').value='';
+      bg.querySelector('#newEmp').value='';
+      renderList();
+      render();
+    }catch(e){
+      alert('فشل الإضافة: ' + e.message);
+    }
+  });
+
+  bg.querySelector('#dayEditClose').addEventListener('click', ()=>{ bg.remove(); render(); });
+}
+
+function esc(str){
+  return (str||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+loadAll();
+</script>
+</body>
+</html>
