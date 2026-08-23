@@ -8,16 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F5F2EC;
-    --surface:#FFFFFF;
-    --ink:#1E2430;
-    --ink-soft:#6B7280;
-    --teal:#0E5C56;
+    --bg:#0B0B0E;
+    --surface:#18181D;
+    --surface-2:#1F1F26;
+    --ink:#F2F2F5;
+    --ink-soft:#9A9AA6;
+    --gold:#D8AD5C;
+    --gold-soft:#3A311F;
+    --teal:#D8AD5C;
     --teal-light:#CDEAE5;
     --coral:#FF6F59;
     --amber:#FFB238;
     --violet:#8B7CF6;
-    --line:#E7E2D8;
+    --line:#2A2A32;
     --danger:#E0555B;
   }
   *{box-sizing:border-box;}
@@ -29,58 +32,73 @@
     min-height:100vh;
   }
   .topbar{
-    background:var(--teal);
-    color:#fff;
-    padding:16px 20px;
+    background:var(--bg);
+    color:var(--ink);
+    padding:18px 20px 10px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:10px;
+    gap:14px;
+    max-width:960px;
+    margin:0 auto;
+  }
+  .topbar-brand{display:flex;align-items:center;gap:12px}
+  .avatar-box{
+    width:52px;height:52px;border-radius:16px;
+    background:var(--gold);color:#1a1408;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:20px;flex-shrink:0;
   }
   .topbar h1{
-    font-size:18px;
+    font-size:19px;
     margin:0;
     font-weight:900;
+    color:var(--ink);
   }
-  .topbar .sub{font-size:12px;opacity:.8;font-weight:400}
+  .topbar .sub{font-size:12px;opacity:.65;font-weight:400;margin-top:2px}
+  .topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
   .btn{
     border:none;
-    border-radius:10px;
+    border-radius:14px;
     padding:10px 16px;
     font-family:inherit;
     font-weight:700;
     font-size:14px;
     cursor:pointer;
-    transition:transform .12s ease, opacity .12s ease;
+    transition:transform .12s ease, opacity .12s ease, background .12s ease;
   }
   .btn:active{transform:scale(.96)}
-  .btn-primary{background:var(--coral);color:#fff}
-  .btn-ghost{background:rgba(255,255,255,.15);color:#fff}
-  .btn-outline{background:#fff;color:var(--teal);border:1px solid var(--teal)}
+  .btn-primary{background:var(--gold);color:#1a1408}
+  .btn-ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+  .btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold)}
   .btn-danger{background:var(--danger);color:#fff}
-  .btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
+  .btn-sm{padding:6px 10px;font-size:12px;border-radius:10px}
   .wrap{max-width:960px;margin:0 auto;padding:18px;}
   .card{
     background:var(--surface);
     border:1px solid var(--line);
-    border-radius:16px;
-    padding:18px;
+    border-radius:20px;
+    padding:20px;
     margin-bottom:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,.28);
   }
-  .card h2{margin:0 0 12px;font-size:16px;color:var(--teal);}
-  .card h3{margin:0 0 8px;font-size:14px;color:var(--ink);}
+  .card h2{margin:0 0 12px;font-size:16px;color:var(--gold);font-weight:900;}
+  .card h3{margin:0 0 8px;font-size:14px;color:var(--ink);font-weight:700;}
   label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px;color:var(--ink-soft)}
   input[type=text],input[type=password],input[type=date],input[type=time],textarea,select{
     width:100%;
     padding:10px 12px;
     border:1px solid var(--line);
-    border-radius:10px;
+    border-radius:12px;
     font-family:inherit;
     font-size:14px;
-    background:#FBFAF7;
+    background:#101014;
+    color:var(--ink);
   }
-  input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#FBFAF7;cursor:pointer}
+  input::placeholder,textarea::placeholder{color:#6b6b76}
+  select option{background:#18181D;color:var(--ink)}
+  input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--line);border-radius:10px;background:#101014;cursor:pointer}
   textarea{min-height:70px;resize:vertical}
   .emp-row{
     display:grid;
@@ -99,25 +117,27 @@
   }
   .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  .hint{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.6}
   .modal-bg{
-    position:fixed;inset:0;background:rgba(20,20,20,.5);
+    position:fixed;inset:0;background:rgba(0,0,0,.65);
     display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;
     overflow:auto;
   }
-  .modal{background:#fff;border-radius:16px;padding:22px;max-width:340px;width:100%;text-align:center}
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5);color:var(--ink)}
   .modal input[type=password]{text-align:center;font-size:20px;letter-spacing:4px;margin:12px 0}
   .day-block{margin-bottom:18px}
-  .day-title{font-weight:900;color:var(--teal);margin-bottom:8px;font-size:14px}
+  .day-title{font-weight:900;color:var(--gold);margin-bottom:8px;font-size:14px}
   .shift-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .shift-card{
-    border-radius:12px;padding:10px 12px;color:#1E2430;
-    border:1px solid rgba(0,0,0,.06);
+    border-radius:16px;padding:12px 14px;color:#1E2430;
+    border:1px solid rgba(0,0,0,.08);
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
   }
   .shift-card .time{font-weight:900;font-size:13px}
   .shift-card .who{font-size:13px;margin-top:4px;font-weight:700}
   .shift-card .note{font-size:11px;color:#4b4b4b;margin-top:2px}
-  .shift-card.open{border:1.5px dashed #9CA3AF;background:#F3F4F6}
+  .shift-card.open{border:1.5px dashed #6b6b76;background:var(--surface-2);color:var(--ink)}
+  .shift-card.open .note{color:var(--ink-soft)}
   .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-inline-end:4px;margin-top:4px}
   .tag-row{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px}
   .empty{
@@ -125,46 +145,49 @@
   }
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
   .status{font-size:12px;color:var(--ink-soft);margin-top:6px}
-  .loading{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-inline-end:6px}
+  .loading{display:inline-block;width:14px;height:14px;border:2px solid #1a1408;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-inline-end:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;color:var(--ink-soft)}
   .legend span{display:flex;align-items:center;gap:5px}
   .legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
   .pencil-btn{
-    position:absolute;top:6px;left:6px;padding:2px 6px;background:#fff;
-    border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:12px;line-height:1.4;
+    position:absolute;top:6px;left:6px;padding:2px 6px;background:rgba(255,255,255,.85);
+    border:1px solid rgba(0,0,0,.1);border-radius:8px;cursor:pointer;font-size:12px;line-height:1.4;
   }
   .day-title-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
   .day-pencil{
-    border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;
+    border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:4px 8px;
     cursor:pointer;font-size:13px;
   }
-  .quick-add-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px;background:#FBFAF7;border:1px solid var(--line);border-radius:10px;padding:8px}
+  .quick-add-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px}
   .quick-add-row select{width:auto;min-width:140px;padding:6px}
-  .quick-btn{background:var(--teal-light);color:var(--teal);border:1px solid var(--teal);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .quick-btn{background:var(--gold-soft);color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
   .inline-emp-select{margin-top:6px;padding:4px;font-size:11px}
   .file-row{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
-  .file-row input[type=file]{font-size:11px;max-width:180px}
+  .file-row input[type=file]{font-size:11px;max-width:180px;color:var(--ink-soft)}
   /* Week view */
-  .week-overlay{position:fixed;inset:0;background:#fff;z-index:80;overflow:auto;padding:16px}
+  .week-overlay{position:fixed;inset:0;background:var(--bg);z-index:80;overflow:auto;padding:16px}
   .week-grid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto}
-  .week-col{border:1px solid var(--line);border-radius:10px;padding:8px;background:#FBFAF7}
-  .week-col h4{margin:0 0 8px;font-size:13px;text-align:center;color:var(--teal)}
-  .week-shift{border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(0,0,0,.06)}
+  .week-col{border:1px solid var(--line);border-radius:16px;padding:10px;background:var(--surface)}
+  .week-col h4{margin:0 0 8px;font-size:13px;text-align:center;color:var(--gold)}
+  .week-shift{border-radius:10px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(0,0,0,.08);color:#1E2430}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div>
-    <h1>جدولة فريق الكول سنتر 🎧</h1>
-    <div class="sub" id="periodLabel">لا يوجد جدول بعد</div>
+  <div class="topbar-brand">
+    <div class="avatar-box">ج</div>
+    <div>
+      <h1>الجدولة</h1>
+      <div class="sub" id="periodLabel">لا يوجد جدول بعد</div>
+    </div>
   </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <div class="topbar-actions">
     <button class="btn btn-ghost" id="weekViewBtn">عرض الأسبوع 🖼️</button>
     <button class="btn btn-ghost" id="refreshBtn">تحديث ⟳</button>
     <button class="btn btn-ghost" id="settingsBtn">الإعدادات 🔒</button>
-    <button class="btn btn-ghost" id="shiftEditBtn">تعديل 🔒</button>
+    <button class="btn btn-primary" id="shiftEditBtn">تعديل الصفحة 🔒</button>
   </div>
 </div>
 
@@ -389,7 +412,7 @@ function renderAdmin(){
 
   if(state.dirty){
     const banner = document.createElement('div');
-    banner.style.cssText = 'background:#FFF3CD;border:1px solid #FFE08A;color:#7A5B00;padding:10px 14px;border-radius:10px;margin-bottom:12px;font-weight:700;font-size:13px';
+    banner.style.cssText = 'background:var(--gold-soft);border:1px solid var(--gold);color:var(--gold);padding:10px 14px;border-radius:14px;margin-bottom:12px;font-weight:700;font-size:13px';
     banner.textContent = '⚠️ لديك تعديلات غير محفوظة — اضغط "حفظ الإعدادات" قبل مغادرة الصفحة أو الضغط على تحديث';
     el.appendChild(banner);
   }
@@ -1257,7 +1280,7 @@ function showShiftEditModal(dayIdx, shiftId){
     const allLabels = state.settings.labels || [];
     box.innerHTML = allLabels.map(l=>{
       const active = localTags.includes(l.name);
-      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'#fff'};color:${active?'#fff':l.color}">${esc(l.name)}</span>`;
+      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'transparent'};color:${active?'#fff':l.color}">${esc(l.name)}</span>`;
     }).join('') || '<div class="hint">لا توجد ليبلات معرّفة — أضفها من الإعدادات</div>';
     box.querySelectorAll('[data-name]').forEach(chip=>{
       chip.addEventListener('click', ()=>{
