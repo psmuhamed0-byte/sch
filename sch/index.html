@@ -201,10 +201,61 @@
   .subcard h3{margin:0 0 4px;font-size:14px;color:var(--ink);font-weight:900;display:flex;align-items:center;gap:6px}
   .dirty-banner{background:var(--gold-soft);border:1px solid var(--gold);color:var(--gold);padding:10px 14px;border-radius:14px;margin-bottom:14px;font-weight:700;font-size:13px}
   .settings-footer{display:flex;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line);background:var(--surface-2);gap:8px;flex-wrap:wrap}
+
+  /* Login gate */
+  .login-screen{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:var(--bg);
+  }
+  .login-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:24px;
+    padding:36px 28px;max-width:360px;width:100%;text-align:center;
+    box-shadow:0 10px 34px rgba(0,0,0,.4);
+  }
+  .login-avatar{
+    width:64px;height:64px;border-radius:18px;margin:0 auto 18px;
+    background:var(--gold);color:#1a1408;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:26px;
+    box-shadow:0 0 26px rgba(216,173,92,.45);
+  }
+  .login-card h1{font-size:24px;font-weight:900;margin:0 0 14px;color:var(--ink)}
+  .login-divider{width:46px;height:2px;background:var(--gold);margin:0 auto 16px;border-radius:2px}
+  .login-sub{font-size:13px;color:var(--ink-soft);margin-bottom:22px;line-height:1.7}
+  .login-input{
+    width:100%;padding:14px 16px;border-radius:14px;
+    border:1px solid var(--gold);background:#101014;color:var(--ink);
+    font-family:inherit;font-size:15px;text-align:center;letter-spacing:1px;
+    margin-bottom:14px;
+  }
+  .login-input::placeholder{color:var(--ink-soft)}
+  .login-btn{
+    width:100%;padding:14px;border:none;border-radius:14px;
+    background:var(--gold);color:#1a1408;font-family:inherit;font-weight:900;font-size:15px;
+    cursor:pointer;transition:transform .12s ease, opacity .12s ease;
+  }
+  .login-btn:active{transform:scale(.97)}
+  .login-error{
+    color:var(--danger);font-size:13px;font-weight:700;min-height:18px;margin-bottom:8px;
+  }
+  #appRoot{display:none}
 </style>
 </head>
 <body>
 
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-avatar">ج</div>
+    <h1>الجدولة</h1>
+    <div class="login-divider"></div>
+    <div class="login-sub">أدخل رمز الدخول لعرض جدول الدوام</div>
+    <div class="login-error" id="loginError"></div>
+    <input type="password" class="login-input" id="loginCodeInput" placeholder="رمز الدخول" maxlength="20">
+    <button class="login-btn" id="loginSubmitBtn">دخول</button>
+  </div>
+</div>
+
+<div id="appRoot">
 <div class="topbar">
   <div class="topbar-brand">
     <div class="avatar-box">ج</div>
@@ -222,6 +273,7 @@
 </div>
 
 <div class="wrap" id="app"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -243,6 +295,46 @@ async function setValue(key, value){
 
 const STORAGE_KEYS = { settings: 'scheduler:settings', schedule: 'scheduler:schedule' };
 const ACCESS_PASSWORD = '0123';
+const SITE_ACCESS_CODE = 'SCH013';
+const SITE_ACCESS_STORAGE_KEY = 'scheduler:site_access_granted';
+
+// ---------- Login gate ----------
+function initLoginGate(){
+  const loginScreen = document.getElementById('loginScreen');
+  const appRoot = document.getElementById('appRoot');
+  const input = document.getElementById('loginCodeInput');
+  const errEl = document.getElementById('loginError');
+  const submitBtn = document.getElementById('loginSubmitBtn');
+
+  function grantAccess(){
+    try{ localStorage.setItem(SITE_ACCESS_STORAGE_KEY, '1'); }catch(e){}
+    loginScreen.style.display = 'none';
+    appRoot.style.display = 'block';
+    loadAll();
+  }
+
+  let alreadyGranted = false;
+  try{ alreadyGranted = localStorage.getItem(SITE_ACCESS_STORAGE_KEY) === '1'; }catch(e){}
+  if(alreadyGranted){
+    grantAccess();
+    return;
+  }
+
+  function tryLogin(){
+    const val = (input.value || '').trim();
+    if(val === SITE_ACCESS_CODE){
+      errEl.textContent = '';
+      grantAccess();
+    } else {
+      errEl.textContent = 'رمز الدخول غير صحيح، حاول مرة أخرى';
+      input.focus();
+      input.select();
+    }
+  }
+  submitBtn.addEventListener('click', tryLogin);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+  input.focus();
+}
 
 const SHIFT_PRESETS = [
   {start:'00:00', end:'08:00', label:'00:00 - 08:00'},
@@ -1668,7 +1760,7 @@ function esc(str){
   return (str||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-loadAll();
+initLoginGate();
 </script>
 </body>
 </html>
