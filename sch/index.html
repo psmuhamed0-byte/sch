@@ -18,9 +18,9 @@
     --gold-soft:#3A311F;
     --teal:#D8AD5C;
     --teal-light:#CDEAE5;
-    --coral:#E8896F;
-    --amber:#E3B98C;
-    --violet:#B9AED9;
+    --coral:#4A241E;
+    --amber:#4A2F1E;
+    --violet:#2E2A4A;
     --line:#2A2A32;
     --danger:#E0555B;
   }
@@ -130,13 +130,13 @@
   .day-title{font-weight:900;color:var(--gold);margin-bottom:8px;font-size:14px}
   .shift-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .shift-card{
-    border-radius:16px;padding:12px 14px;color:#211C12;
-    border:1px solid rgba(0,0,0,.08);
-    box-shadow:0 2px 8px rgba(0,0,0,.18);
+    border-radius:16px;padding:12px 14px;color:var(--ink);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 2px 8px rgba(0,0,0,.28);
   }
   .shift-card .time{font-weight:900;font-size:13px}
   .shift-card .who{font-size:13px;margin-top:4px;font-weight:700}
-  .shift-card .note{font-size:11px;color:#4b4436;margin-top:2px}
+  .shift-card .note{font-size:11px;color:rgba(242,242,245,.72);margin-top:2px}
   .shift-card.open{border:1.5px dashed #6b6b76;background:var(--surface-2);color:var(--ink)}
   .shift-card.open .note{color:var(--ink-soft)}
   .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-inline-end:4px;margin-top:4px}
@@ -171,7 +171,7 @@
   .week-grid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto}
   .week-col{border:1px solid var(--line);border-radius:16px;padding:10px;background:var(--surface)}
   .week-col h4{margin:0 0 8px;font-size:13px;text-align:center;color:var(--gold)}
-  .week-shift{border-radius:10px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(0,0,0,.08);color:#211C12}
+  .week-shift{border-radius:10px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(255,255,255,.08);color:var(--ink)}
 
   /* Settings tabs (redesigned admin) */
   .settings-shell{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.28);margin-bottom:16px}
@@ -371,12 +371,12 @@ function emptySettings(){
     startDate: '',
     endDate: '',
     shiftLabels: [
-      {id: uid('sl'), name:'الوردية الصباحية', color:'#E8D9B5'},
-      {id: uid('sl'), name:'الوردية المسائية', color:'#E3B98C'},
-      {id: uid('sl'), name:'الوردية الليلية', color:'#B9AED9'},
+      {id: uid('sl'), name:'الوردية الصباحية', color:'#4A3A1E'},
+      {id: uid('sl'), name:'الوردية المسائية', color:'#4A2F1E'},
+      {id: uid('sl'), name:'الوردية الليلية', color:'#2E2A4A'},
     ],
     labels: [
-      {id: uid('lb'), name:'ATM', color:'#E8896F'},
+      {id: uid('lb'), name:'ATM', color:'#4A241E'},
     ]
   };
 }
@@ -640,7 +640,7 @@ function buildAdminSection(tabId){
     const slRows = box.querySelector('#slRows');
     renderLabelListRows(slRows, state.settings.shiftLabels);
     box.querySelector('#addSlBtn').addEventListener('click', ()=>{
-      state.settings.shiftLabels.push({id:uid('sl'), name:'', color:'#E8D9B5'});
+      state.settings.shiftLabels.push({id:uid('sl'), name:'', color:'#4A3A1E'});
       renderLabelListRows(slRows, state.settings.shiftLabels);
       markDirty();
     });
@@ -655,7 +655,7 @@ function buildAdminSection(tabId){
     const lbRows = box.querySelector('#lbRows');
     renderLabelListRows(lbRows, state.settings.labels);
     box.querySelector('#addLbBtn').addEventListener('click', ()=>{
-      state.settings.labels.push({id:uid('lb'), name:'', color:'#E8896F'});
+      state.settings.labels.push({id:uid('lb'), name:'', color:'#4A241E'});
       renderLabelListRows(lbRows, state.settings.labels);
       markDirty();
     });
@@ -713,7 +713,7 @@ function renderLabelListRows(container, list){
     row.className = 'label-row';
     row.innerHTML = `
       <input type="text" placeholder="الاسم" value="${esc(item.name)}" data-f="name">
-      <input type="color" value="${item.color||'#E8D9B5'}" data-f="color">
+      <input type="color" value="${item.color||'#4A3A1E'}" data-f="color">
       <button class="btn btn-danger btn-sm" data-del>✕</button>
     `;
     row.querySelector('[data-f="name"]').addEventListener('input', e=>{ item.name = e.target.value; markDirty(); });
@@ -740,7 +740,7 @@ function renderEmpRows(container){
         <option value="انثى" ${emp.gender==='انثى'?'selected':''}>انثى</option>
       </select>
       <input type="text" placeholder="ملاحظة" value="${esc(emp.note)}" data-f="note">
-      <input type="color" value="${emp.color||'#E8D9B5'}" data-f="color" title="لون خاص بالموظف">
+      <input type="color" value="${emp.color||'#4A3A1E'}" data-f="color" title="لون خاص بالموظف">
       <button class="btn btn-danger btn-sm" data-del>✕</button>
     `;
     row.querySelectorAll('input,select').forEach(inp=>{
@@ -1153,7 +1153,7 @@ function concurrencyWarning(day, currentShiftId, brk){
 function empById(id){
   return (state.settings.employees||[]).find(e=>e.id===id);
 }
-const FALLBACK_COLORS = ['#E8D9B5','#E3B98C','#B9AED9','#D9C2A6','#A8C9C2'];
+const FALLBACK_COLORS = ['#4A3A1E','#4A2F1E','#2E2A4A','#3A3320','#1E3A36'];
 function colorForLabel(label){
   let h=0; for(const c of (label||'')) h = (h*31 + c.charCodeAt(0))>>>0;
   return FALLBACK_COLORS[h % FALLBACK_COLORS.length];
@@ -1171,8 +1171,8 @@ function labelDef(name){
 function tagBadges(shift){
   return (shift.tags||[]).map(t=>{
     const ld = labelDef(t);
-    const color = ld ? ld.color : '#B9AED9';
-    return `<span class="badge" style="background:${color};color:#211C12">${esc(t)}</span>`;
+    const color = ld ? ld.color : '#2E2A4A';
+    return `<span class="badge" style="background:${color};color:var(--ink)">${esc(t)}</span>`;
   }).join('');
 }
 
@@ -1211,7 +1211,7 @@ function renderEmployeeView(){
 
   // Legend
   const legendCard = document.createElement('div');
-  legendCard.innerHTML = `<div class="legend"><span><i style="background:#E8D9B5"></i>شيفتات</span><span><i style="background:#F3F4F6;border:1px dashed #9CA3AF"></i>شيفت متاح (بدون موظف)</span></div>`;
+  legendCard.innerHTML = `<div class="legend"><span><i style="background:#4A3A1E"></i>شيفتات</span><span><i style="background:#F3F4F6;border:1px dashed #9CA3AF"></i>شيفت متاح (بدون موظف)</span></div>`;
   el.appendChild(legendCard);
 
   // Schedule days
@@ -1486,7 +1486,7 @@ function showShiftEditModal(dayIdx, shiftId){
     const allLabels = state.settings.labels || [];
     box.innerHTML = allLabels.map(l=>{
       const active = localTags.includes(l.name);
-      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'transparent'};color:${active?'#211C12':l.color}">${esc(l.name)}</span>`;
+      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'transparent'};color:${active?'var(--ink)':l.color}">${esc(l.name)}</span>`;
     }).join('') || '<div class="hint">لا توجد ليبلات معرّفة — أضفها من الإعدادات</div>';
     box.querySelectorAll('[data-name]').forEach(chip=>{
       chip.addEventListener('click', ()=>{
