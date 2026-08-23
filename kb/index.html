@@ -7,22 +7,102 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  body { font-family: "Tahoma","Segoe UI","Cairo",system-ui,-apple-system,sans-serif; background:#f9fafb; }
-  .accordion-content { overflow:hidden; transition:max-height .35s ease, opacity .25s ease; }
-  .rte { min-height:120px; padding:12px 16px; outline:none; line-height:2; }
+  :root {
+    --bg: #0a0a0f;
+    --surface: #14141c;
+    --surface2: #1c1c28;
+    --border: #2a2a3a;
+    --accent: #8b5cf6;
+    --accent2: #6366f1;
+    --text: #e4e4ec;
+    --muted: #8b8b9e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Tahoma","Segoe UI","Cairo",system-ui,-apple-system,sans-serif;
+    background: radial-gradient(circle at 20% 0%, #1a1530 0%, transparent 45%),
+                radial-gradient(circle at 80% 10%, #0f1a30 0%, transparent 40%),
+                var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .glass {
+    background: rgba(20,20,28,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+  }
+  .card {
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(139,92,246,.25);
+    border-color: rgba(139,92,246,.4);
+  }
+  .grad-text {
+    background: linear-gradient(90deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.1); box-shadow: 0 10px 25px -8px rgba(139,92,246,.6); }
+  .btn-primary:active { transform: translateY(0); }
+  input, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(139,92,246,.18);
+    background: #201f2e;
+  }
+  .fade-in { animation: fadeIn .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  .fade-in-fast { animation: fadeIn .2s ease; }
+  .pop-in { animation: popIn .25s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from{opacity:0;transform:scale(.92);} to{opacity:1;transform:scale(1);} }
+  .stagger > * { animation: fadeIn .4s cubic-bezier(.2,.8,.2,1) backwards; }
+  .accordion-content { overflow:hidden; transition: max-height .4s cubic-bezier(.2,.8,.2,1), opacity .3s ease; }
+  .chevron { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+  .rte { min-height:120px; padding:14px 18px; outline:none; line-height:2; color: var(--text); }
   .rte ul { list-style:disc; padding-inline-start:1.5rem; }
   .rte ol { list-style:decimal; padding-inline-start:1.5rem; }
   .rte img { max-width:100%; border-radius:.75rem; margin:.5rem 0; }
-  .rte blockquote { border-inline-start:3px solid #a5b4fc; padding-inline-start:1rem; color:#4b5563; font-style:italic; }
-  .toolbtn { padding:6px; border-radius:8px; color:#4b5563; }
-  .toolbtn:hover { background:#e5e7eb; }
-  ::-webkit-scrollbar{width:8px;height:8px;}
-  ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px;}
-  .fade-in { animation: fadeIn .2s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+  .rte blockquote { border-inline-start:3px solid var(--accent); padding-inline-start:1rem; color:var(--muted); font-style:italic; }
+  .toolbtn { padding:7px 9px; border-radius:8px; color:var(--muted); transition: background .15s, color .15s; }
+  .toolbtn:hover { background: rgba(139,92,246,.15); color: #c4b5fd; }
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:#3a3a4e;border-radius:999px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+  .glow-icon {
+    box-shadow: 0 0 0 1px rgba(139,92,246,.3), 0 8px 20px -6px rgba(139,92,246,.5);
+  }
+  .search-hit { animation: fadeIn .3s ease backwards; }
+  .highlight { background: linear-gradient(180deg, transparent 60%, rgba(139,92,246,.45) 60%); border-radius: 2px; padding: 0 1px; color: #fff; }
+  .shimmer {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 37%, var(--surface) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer { 0%{background-position:100% 50%;} 100%{background-position:0 50%;} }
+  .pulse-dot { animation: pulseDot 1.4s ease infinite; }
+  @keyframes pulseDot { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+  a, button { -webkit-tap-highlight-color: transparent; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col text-gray-800">
+<body class="min-h-screen flex flex-col">
 
 <div id="app" class="flex-1 flex flex-col"></div>
 
@@ -41,7 +121,8 @@ let state = {
   view: sessionStorage.getItem("kb_access_ok") === "true" ? "categories" : "gate",
   categoryId: null,
   categories: [],
-  sections: [],
+  allSections: [], // كل السيكشنات من كل الأقسام (للبحث الشامل)
+  sections: [],    // سيكشنات القسم الحالي فقط
   currentCategory: null,
   query: "",
   editMode: false,
@@ -61,19 +142,37 @@ function esc(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 }
 
+function highlightText(text, q) {
+  if (!q) return esc(text);
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return esc(text);
+  const before = esc(text.slice(0, idx));
+  const match = esc(text.slice(idx, idx + q.length));
+  const after = esc(text.slice(idx + q.length));
+  return `${before}<span class="highlight">${match}</span>${after}`;
+}
+
+function snippet(text, q, len = 90) {
+  if (!text) return "";
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return text.slice(0, len);
+  const start = Math.max(0, idx - 30);
+  return (start > 0 ? "…" : "") + text.slice(start, start + len) + "…";
+}
+
 /* ========================= صفحة الدخول ========================= */
 function renderGate() {
   app.innerHTML = `
   <div class="flex-1 flex items-center justify-center p-4">
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-4 fade-in">
-      <div class="bg-indigo-100 text-indigo-600 rounded-full p-4 text-3xl">📚</div>
-      <h1 class="text-xl font-bold text-gray-800">قاعدة المعرفة</h1>
-      <p class="text-sm text-gray-500 text-center">أدخل رمز الدخول لعرض المعلومات</p>
+    <div class="w-full max-w-sm glass rounded-3xl shadow-2xl p-9 flex flex-col items-center gap-4 pop-in">
+      <div class="rounded-full p-5 text-4xl btn-primary glow-icon">📚</div>
+      <h1 class="text-2xl font-bold grad-text">قاعدة المعرفة</h1>
+      <p class="text-sm text-[var(--muted)] text-center">أدخل رمز الدخول لعرض المعلومات</p>
       <form id="gate-form" class="w-full flex flex-col gap-3 mt-2">
         <input id="gate-input" autofocus placeholder="ادخل الرمز"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-        <p id="gate-error" class="text-red-500 text-sm text-center hidden">الرمز غير صحيح، حاول مرة أخرى</p>
-        <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2.5 font-semibold transition">دخول</button>
+          class="w-full rounded-2xl px-4 py-3 text-center tracking-[0.3em] uppercase text-lg" />
+        <p id="gate-error" class="text-red-400 text-sm text-center hidden">الرمز غير صحيح، حاول مرة أخرى</p>
+        <button class="btn-primary text-white rounded-2xl py-3 font-semibold">دخول</button>
       </form>
     </div>
   </div>`;
@@ -84,77 +183,121 @@ function renderGate() {
       sessionStorage.setItem("kb_access_ok", "true");
       loadCategories();
     } else {
-      document.getElementById("gate-error").classList.remove("hidden");
+      const err = document.getElementById("gate-error");
+      err.classList.remove("hidden");
+      const box = document.getElementById("gate-input");
+      box.animate([{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}], {duration:250});
     }
   });
 }
 
-/* ========================= صفحة الكاردات ========================= */
+/* ========================= صفحة الكاردات + البحث الشامل ========================= */
 async function loadCategories() {
   setState({ view: "categories", loading: true });
-  const { data, error } = await sb.from("kb_categories").select("*").order("position", { ascending: true });
-  setState({ categories: data || [], loading: false });
+  const { data: cats } = await sb.from("kb_categories").select("*").order("position", { ascending: true });
+  const { data: secs } = await sb.from("kb_sections").select("id, category_id, title, content_text");
+  setState({ categories: cats || [], allSections: secs || [], loading: false });
 }
 
-function filteredCategories() {
+function searchResults() {
   const q = state.query.trim().toLowerCase();
-  if (!q) return state.categories;
-  return state.categories.filter(c =>
+  if (!q) return { cats: state.categories, secHits: [] };
+
+  const cats = state.categories.filter(c =>
     (c.title || "").toLowerCase().includes(q) || (c.description || "").toLowerCase().includes(q)
   );
+
+  const secHits = state.allSections
+    .filter(s => (s.title || "").toLowerCase().includes(q) || (s.content_text || "").toLowerCase().includes(q))
+    .map(s => ({ ...s, category: state.categories.find(c => c.id === s.category_id) }))
+    .filter(s => s.category);
+
+  return { cats, secHits };
 }
 
 function renderCategories() {
-  const list = filteredCategories();
+  const q = state.query.trim();
+  const { cats, secHits } = searchResults();
+  const hasQuery = q.length > 0;
+
   app.innerHTML = `
-  <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+  <header class="glass sticky top-0 z-30">
     <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2 text-indigo-600 font-bold"><span>📚</span><span>قاعدة المعرفة</span></div>
+      <div class="flex items-center gap-2 font-bold text-lg"><span class="text-xl">📚</span><span class="grad-text">قاعدة المعرفة</span></div>
       <div class="flex items-center gap-2">
         ${state.editMode
-          ? `<button id="end-edit" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg px-3 py-1.5">✕ إنهاء التعديل</button>`
-          : `<button id="ask-edit" class="flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm rounded-lg px-3 py-1.5">✏️ تعديل</button>`}
-        <button id="logout" title="خروج" class="text-gray-400 hover:text-red-500 text-sm rounded-lg px-2 py-1.5">⏻</button>
+          ? `<button id="end-edit" class="flex items-center gap-1 bg-white/5 hover:bg-white/10 text-[var(--text)] text-sm rounded-xl px-3 py-1.5 border border-[var(--border)] transition">✕ إنهاء التعديل</button>`
+          : `<button id="ask-edit" class="flex items-center gap-1 bg-[var(--accent)]/15 hover:bg-[var(--accent)]/25 text-[#c4b5fd] text-sm rounded-xl px-3 py-1.5 transition">✏️ تعديل</button>`}
+        <button id="logout" title="خروج" class="text-[var(--muted)] hover:text-red-400 text-sm rounded-xl px-2 py-1.5 transition">⏻</button>
       </div>
     </div>
     <div class="max-w-5xl mx-auto px-4 pb-4">
       <div class="relative">
-        <span class="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400">🔍</span>
-        <input id="search-cat" value="${esc(state.query)}" placeholder="ابحث عن عنوان..."
-          class="w-full border border-gray-300 rounded-xl pr-10 pl-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        <span class="absolute top-1/2 -translate-y-1/2 right-4 text-[var(--muted)]">🔍</span>
+        <input id="search-cat" value="${esc(state.query)}" placeholder="ابحث في كل شي... عناوين، محتوى، كل شي"
+          class="w-full rounded-2xl pr-11 pl-4 py-3 text-base" />
+        ${hasQuery ? `<button id="clear-search" class="absolute top-1/2 -translate-y-1/2 left-4 text-[var(--muted)] hover:text-white transition">✕</button>` : ""}
       </div>
     </div>
   </header>
   <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-1">
-    ${state.editMode ? `<button id="add-card" class="mb-4 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2 text-sm font-semibold">➕ إضافة عنوان جديد</button>` : ""}
-    ${state.loading ? `<p class="text-gray-400 text-center py-10">جارِ التحميل...</p>`
-      : list.length === 0 ? `<p class="text-gray-400 text-center py-10">لا توجد نتائج</p>`
-      : `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          ${list.map(cat => `
-            <div class="relative group">
-              <a href="#" data-open-cat="${cat.id}" class="block bg-white rounded-2xl shadow-sm hover:shadow-md border border-gray-100 p-5 transition h-full">
-                <div class="text-3xl mb-3">${esc(cat.icon || "📁")}</div>
-                <h3 class="font-bold text-gray-800 mb-1">${esc(cat.title)}</h3>
-                <p class="text-sm text-gray-500 line-clamp-2">${esc(cat.description || "")}</p>
-              </a>
-              ${state.editMode ? `
-                <div class="absolute top-3 left-3 flex gap-1">
-                  <button data-edit-card="${cat.id}" class="bg-white shadow rounded-lg p-1.5 text-gray-500 hover:text-indigo-600">✏️</button>
-                  <button data-del-card="${cat.id}" class="bg-white shadow rounded-lg p-1.5 text-gray-500 hover:text-red-500">🗑️</button>
-                </div>` : ""}
-            </div>`).join("")}
-        </div>`}
+    ${state.editMode ? `<button id="add-card" class="mb-5 flex items-center gap-2 btn-primary text-white rounded-2xl px-4 py-2.5 text-sm font-semibold">➕ إضافة عنوان جديد</button>` : ""}
+
+    ${state.loading ? skeletonCards() : ""}
+
+    ${!state.loading && hasQuery && secHits.length > 0 ? `
+      <div class="mb-6 fade-in">
+        <p class="text-xs text-[var(--muted)] mb-2 flex items-center gap-1">✨ نتائج من داخل المحتوى (${secHits.length})</p>
+        <div class="flex flex-col gap-2">
+          ${secHits.slice(0, 8).map((s, i) => `
+            <a href="#" data-open-hit data-cat="${s.category_id}" data-sec="${s.id}"
+              class="search-hit card rounded-2xl px-4 py-3 flex items-center gap-3" style="animation-delay:${i*40}ms">
+              <span class="text-lg">${esc(s.category?.icon || "📁")}</span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-[var(--text)] truncate">${highlightText(s.title, q)}</p>
+                <p class="text-xs text-[var(--muted)] truncate">${highlightText(snippet(s.content_text || "", q), q)}</p>
+              </div>
+              <span class="text-xs text-[var(--muted)] shrink-0">${esc(s.category?.title || "")} ←</span>
+            </a>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+    ${!state.loading ? (
+      cats.length === 0 && secHits.length === 0
+        ? `<p class="text-[var(--muted)] text-center py-16 fade-in">لا توجد نتائج مطابقة 🔍</p>`
+        : cats.length > 0 ? `
+          ${hasQuery ? `<p class="text-xs text-[var(--muted)] mb-2">📁 العناوين (${cats.length})</p>` : ""}
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 stagger">
+            ${cats.map((cat, i) => `
+              <div class="relative group" style="animation-delay:${i*45}ms">
+                <a href="#" data-open-cat="${cat.id}" class="card block rounded-2xl p-5 h-full">
+                  <div class="text-3xl mb-3">${esc(cat.icon || "📁")}</div>
+                  <h3 class="font-bold text-[var(--text)] mb-1">${hasQuery ? highlightText(cat.title, q) : esc(cat.title)}</h3>
+                  <p class="text-sm text-[var(--muted)] line-clamp-2">${hasQuery ? highlightText(cat.description || "", q) : esc(cat.description || "")}</p>
+                </a>
+                ${state.editMode ? `
+                  <div class="absolute top-3 left-3 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <button data-edit-card="${cat.id}" class="bg-black/40 backdrop-blur rounded-lg p-1.5 text-[var(--muted)] hover:text-[#c4b5fd] transition">✏️</button>
+                    <button data-del-card="${cat.id}" class="bg-black/40 backdrop-blur rounded-lg p-1.5 text-[var(--muted)] hover:text-red-400 transition">🗑️</button>
+                  </div>` : ""}
+              </div>`).join("")}
+          </div>` : ""
+    ) : ""}
   </main>
   <div id="modal-root"></div>
   `;
 
-  document.getElementById("search-cat").addEventListener("input", (e) => {
+  const searchInput = document.getElementById("search-cat");
+  searchInput.addEventListener("input", (e) => {
     state.query = e.target.value;
     renderCategories();
-    document.getElementById("search-cat").focus();
     const el = document.getElementById("search-cat");
-    el.selectionStart = el.selectionEnd = el.value.length;
+    el.focus(); el.selectionStart = el.selectionEnd = el.value.length;
   });
+  const clearBtn = document.getElementById("clear-search");
+  if (clearBtn) clearBtn.addEventListener("click", () => { state.query = ""; renderCategories(); });
+
   document.getElementById("logout").addEventListener("click", () => {
     sessionStorage.removeItem("kb_access_ok");
     setState({ view: "gate", editMode: false });
@@ -167,9 +310,12 @@ function renderCategories() {
   if (addCard) addCard.addEventListener("click", () => openCardModal({}));
 
   document.querySelectorAll("[data-open-cat]").forEach(el => {
+    el.addEventListener("click", (e) => { e.preventDefault(); openCategory(el.getAttribute("data-open-cat")); });
+  });
+  document.querySelectorAll("[data-open-hit]").forEach(el => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
-      openCategory(el.getAttribute("data-open-cat"));
+      openCategory(el.getAttribute("data-cat"), el.getAttribute("data-sec"));
     });
   });
   document.querySelectorAll("[data-edit-card]").forEach(el => {
@@ -189,39 +335,45 @@ function renderCategories() {
   });
 }
 
+function skeletonCards() {
+  return `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    ${[1,2,3,4,5,6].map(() => `<div class="shimmer rounded-2xl h-32 border border-[var(--border)]"></div>`).join("")}
+  </div>`;
+}
+
 function openCardModal(card) {
   const isNew = !card.id;
   const root = document.getElementById("modal-root");
   let icon = card.icon || "📁";
   root.innerHTML = `
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
-      <button id="close-modal" class="absolute left-4 top-4 text-gray-400 hover:text-gray-600">✕</button>
-      <h2 class="font-bold text-gray-800 mb-4">${isNew ? "إضافة عنوان جديد" : "تعديل العنوان"}</h2>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in-fast">
+    <div class="glass rounded-3xl shadow-2xl w-full max-w-md p-6 relative pop-in">
+      <button id="close-modal" class="absolute left-4 top-4 text-[var(--muted)] hover:text-white transition">✕</button>
+      <h2 class="font-bold text-lg mb-4 grad-text">${isNew ? "إضافة عنوان جديد" : "تعديل العنوان"}</h2>
       <div class="flex flex-col gap-3">
         <div>
-          <label class="text-xs text-gray-500 mb-1 block">الأيقونة</label>
+          <label class="text-xs text-[var(--muted)] mb-1 block">الأيقونة</label>
           <div id="emoji-picker" class="flex flex-wrap gap-2">
-            ${EMOJIS.map(e => `<button data-emoji="${e}" class="text-xl w-9 h-9 rounded-lg border ${e===icon?"border-indigo-500 bg-indigo-50":"border-gray-200"}">${e}</button>`).join("")}
+            ${EMOJIS.map(e => `<button data-emoji="${e}" class="text-xl w-9 h-9 rounded-xl border transition ${e===icon?"border-[var(--accent)] bg-[var(--accent)]/15":"border-[var(--border)]"}">${e}</button>`).join("")}
           </div>
         </div>
         <div>
-          <label class="text-xs text-gray-500 mb-1 block">العنوان</label>
-          <input id="card-title" value="${esc(card.title || "")}" class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="مثال: السياسات العامة" />
+          <label class="text-xs text-[var(--muted)] mb-1 block">العنوان</label>
+          <input id="card-title" value="${esc(card.title || "")}" class="w-full rounded-xl px-3 py-2.5" placeholder="مثال: السياسات العامة" />
         </div>
         <div>
-          <label class="text-xs text-gray-500 mb-1 block">وصف قصير</label>
-          <textarea id="card-desc" rows="3" class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="وصف مختصر">${esc(card.description || "")}</textarea>
+          <label class="text-xs text-[var(--muted)] mb-1 block">وصف قصير</label>
+          <textarea id="card-desc" rows="3" class="w-full rounded-xl px-3 py-2.5" placeholder="وصف مختصر">${esc(card.description || "")}</textarea>
         </div>
-        <button id="save-card" class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2.5 font-semibold mt-2">💾 حفظ</button>
+        <button id="save-card" class="flex items-center justify-center gap-2 btn-primary text-white rounded-xl py-2.5 font-semibold mt-2">💾 حفظ</button>
       </div>
     </div>
   </div>`;
   document.getElementById("close-modal").addEventListener("click", () => root.innerHTML = "");
   document.querySelectorAll("[data-emoji]").forEach(b => b.addEventListener("click", () => {
     icon = b.getAttribute("data-emoji");
-    document.querySelectorAll("[data-emoji]").forEach(x => x.className = "text-xl w-9 h-9 rounded-lg border border-gray-200");
-    b.className = "text-xl w-9 h-9 rounded-lg border border-indigo-500 bg-indigo-50";
+    document.querySelectorAll("[data-emoji]").forEach(x => x.className = "text-xl w-9 h-9 rounded-xl border border-[var(--border)] transition");
+    b.className = "text-xl w-9 h-9 rounded-xl border border-[var(--accent)] bg-[var(--accent)]/15 transition";
   }));
   document.getElementById("save-card").addEventListener("click", async () => {
     const title = document.getElementById("card-title").value.trim();
@@ -238,11 +390,18 @@ function openCardModal(card) {
 }
 
 /* ========================= صفحة تفاصيل العنوان (السيكشنات) ========================= */
-async function openCategory(id) {
+async function openCategory(id, focusSectionId) {
   setState({ view: "detail", categoryId: id, loading: true, query: "", openIds: new Set() });
   const { data: cat } = await sb.from("kb_categories").select("*").eq("id", id).single();
   const { data: secs } = await sb.from("kb_sections").select("*, kb_files(*)").eq("category_id", id).order("position", { ascending: true });
+  if (focusSectionId) state.openIds.add(focusSectionId);
   setState({ currentCategory: cat, sections: secs || [], loading: false });
+  if (focusSectionId) {
+    setTimeout(() => {
+      const el = document.querySelector(`[data-section="${focusSectionId}"]`);
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.animate([{boxShadow:"0 0 0 3px rgba(139,92,246,.6)"},{boxShadow:"0 0 0 0 rgba(139,92,246,0)"}], {duration:1200}); }
+    }, 150);
+  }
 }
 
 function filteredSections() {
@@ -256,30 +415,31 @@ function filteredSections() {
 
 function renderDetail() {
   const cat = state.currentCategory;
+  const q = state.query.trim();
   const list = filteredSections();
   app.innerHTML = `
-  <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+  <header class="glass sticky top-0 z-30">
     <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-      <button id="back-btn" class="flex items-center gap-1 text-gray-500 hover:text-indigo-600 text-sm">→ رجوع</button>
-      <div class="flex items-center gap-2 font-bold text-gray-800"><span class="text-xl">${esc(cat?.icon)}</span><span>${esc(cat?.title)}</span></div>
+      <button id="back-btn" class="flex items-center gap-1 text-[var(--muted)] hover:text-white text-sm transition">→ رجوع</button>
+      <div class="flex items-center gap-2 font-bold"><span class="text-xl">${esc(cat?.icon)}</span><span class="grad-text">${esc(cat?.title)}</span></div>
       ${state.editMode
-        ? `<button id="end-edit2" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-lg px-3 py-1.5">✕ إنهاء</button>`
-        : `<button id="ask-edit2" class="flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm rounded-lg px-3 py-1.5">✏️ تعديل</button>`}
+        ? `<button id="end-edit2" class="flex items-center gap-1 bg-white/5 hover:bg-white/10 text-[var(--text)] text-sm rounded-xl px-3 py-1.5 border border-[var(--border)] transition">✕ إنهاء</button>`
+        : `<button id="ask-edit2" class="flex items-center gap-1 bg-[var(--accent)]/15 hover:bg-[var(--accent)]/25 text-[#c4b5fd] text-sm rounded-xl px-3 py-1.5 transition">✏️ تعديل</button>`}
     </div>
     <div class="max-w-3xl mx-auto px-4 pb-4">
       <div class="relative">
-        <span class="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400">🔍</span>
+        <span class="absolute top-1/2 -translate-y-1/2 right-4 text-[var(--muted)]">🔍</span>
         <input id="search-sec" value="${esc(state.query)}" placeholder="ابحث داخل ${esc(cat?.title || "")}..."
-          class="w-full border border-gray-300 rounded-xl pr-10 pl-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          class="w-full rounded-2xl pr-11 pl-4 py-3" />
       </div>
     </div>
   </header>
   <main class="max-w-3xl mx-auto w-full px-4 py-6 flex-1 flex flex-col gap-3">
-    ${state.editMode ? `<button id="add-sec" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 py-2 text-sm font-semibold w-fit">➕ إضافة سيكشن جديد</button>` : ""}
-    <div id="sections-list" class="flex flex-col gap-3">
-      ${state.loading ? `<p class="text-gray-400 text-center py-10">جارِ التحميل...</p>`
-        : list.length === 0 ? `<p class="text-gray-400 text-center py-10">لا توجد نتائج</p>`
-        : list.map(sec => sectionHTML(sec)).join("")}
+    ${state.editMode ? `<button id="add-sec" class="flex items-center gap-2 btn-primary text-white rounded-2xl px-4 py-2.5 text-sm font-semibold w-fit">➕ إضافة سيكشن جديد</button>` : ""}
+    <div id="sections-list" class="flex flex-col gap-3 stagger">
+      ${state.loading ? [1,2,3].map(() => `<div class="shimmer rounded-2xl h-16 border border-[var(--border)]"></div>`).join("")
+        : list.length === 0 ? `<p class="text-[var(--muted)] text-center py-16 fade-in">لا توجد نتائج 🔍</p>`
+        : list.map((sec, i) => sectionHTML(sec, q, i)).join("")}
     </div>
   </main>
   <div id="modal-root"></div>
@@ -302,23 +462,23 @@ function renderDetail() {
   wireSectionEvents();
 }
 
-function sectionHTML(sec) {
+function sectionHTML(sec, q, i) {
   const open = state.openIds.has(sec.id);
   const files = sec.kb_files || [];
   return `
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-section="${sec.id}">
+  <div class="card rounded-2xl overflow-hidden" data-section="${sec.id}" style="animation-delay:${i*40}ms">
     <div class="flex items-center justify-between gap-2 px-5 py-4 cursor-pointer select-none" data-toggle="${sec.id}">
       ${state.editMode
-        ? `<input data-title-input="${sec.id}" value="${esc(sec.title)}" class="font-semibold text-gray-800 bg-transparent border-b border-dashed border-gray-300 focus:outline-none focus:border-indigo-400 flex-1" />`
-        : `<h3 class="font-semibold text-gray-800">${esc(sec.title)}</h3>`}
+        ? `<input data-title-input="${sec.id}" value="${esc(sec.title)}" class="font-semibold bg-transparent border-b border-dashed border-[var(--border)] focus:outline-none focus:border-[var(--accent)] flex-1 py-1" />`
+        : `<h3 class="font-semibold">${q ? highlightText(sec.title, q) : esc(sec.title)}</h3>`}
       <div class="flex items-center gap-2 shrink-0">
-        ${state.editMode ? `<button data-del-sec="${sec.id}" class="text-gray-400 hover:text-red-500 p-1">🗑️</button>` : ""}
-        <span class="text-gray-400 transition-transform inline-block" style="transform:rotate(${open?180:0}deg)">▼</span>
+        ${state.editMode ? `<button data-del-sec="${sec.id}" class="text-[var(--muted)] hover:text-red-400 p-1 transition">🗑️</button>` : ""}
+        <span class="chevron text-[var(--muted)] inline-block" style="transform:rotate(${open?180:0}deg)">▼</span>
       </div>
     </div>
     <div class="accordion-content" style="max-height:${open?5000:0}px; opacity:${open?1:0}">
-      <div class="border-t border-gray-100 px-5 py-4">
-        <div class="border border-gray-200 rounded-xl overflow-hidden bg-white">
+      <div class="border-t border-[var(--border)] px-5 py-4">
+        <div class="border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface2)]">
           ${state.editMode ? toolbarHTML(sec.id) : ""}
           <div class="rte" contenteditable="${state.editMode}" data-rte="${sec.id}" dir="auto">${sec.content_html || "<p></p>"}</div>
         </div>
@@ -330,7 +490,7 @@ function sectionHTML(sec) {
           ${state.editMode ? `
           <div class="mt-3">
             <input type="file" data-upload-input="${sec.id}" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx" />
-            <button data-upload-btn="${sec.id}" class="flex items-center gap-2 text-sm border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-600 rounded-xl px-4 py-2 text-gray-500">
+            <button data-upload-btn="${sec.id}" class="flex items-center gap-2 text-sm border border-dashed border-[var(--border)] hover:border-[var(--accent)] hover:text-[#c4b5fd] rounded-xl px-4 py-2 text-[var(--muted)] transition">
               📎 إضافة صورة / فيديو / ملف
             </button>
           </div>` : ""}
@@ -342,25 +502,25 @@ function sectionHTML(sec) {
 
 function toolbarHTML(sid) {
   return `
-  <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-gray-50 p-2" data-toolbar="${sid}">
+  <div class="flex flex-wrap items-center gap-1 border-b border-[var(--border)] bg-black/20 p-2" data-toolbar="${sid}">
     <button class="toolbtn" data-cmd="bold" title="عريض"><b>B</b></button>
     <button class="toolbtn" data-cmd="italic" title="مائل"><i>I</i></button>
     <button class="toolbtn" data-cmd="underline" title="تحته خط"><u>U</u></button>
     <button class="toolbtn" data-cmd="insertUnorderedList" title="نقاط">• ‎—</button>
     <button class="toolbtn" data-cmd="insertOrderedList" title="مرقمة">1.</button>
     <button class="toolbtn" data-cmd="formatBlock" data-val="blockquote" title="اقتباس">❝</button>
-    <span class="w-px h-6 bg-gray-300 mx-1"></span>
+    <span class="w-px h-6 bg-[var(--border)] mx-1"></span>
     <button class="toolbtn" data-cmd="justifyRight" title="محاذاة يمين">⇥</button>
     <button class="toolbtn" data-cmd="justifyCenter" title="محاذاة وسط">≡</button>
     <button class="toolbtn" data-cmd="justifyLeft" title="محاذاة يسار">⇤</button>
-    <span class="w-px h-6 bg-gray-300 mx-1"></span>
-    <label class="flex items-center gap-1 text-xs text-gray-600 cursor-pointer" title="لون النص">
+    <span class="w-px h-6 bg-[var(--border)] mx-1"></span>
+    <label class="flex items-center gap-1 text-xs text-[var(--muted)] cursor-pointer" title="لون النص">
       🎨 <input type="color" data-color="${sid}" class="w-6 h-6 border-0 p-0 bg-transparent cursor-pointer" />
     </label>
-    <label class="flex items-center gap-1 text-xs text-gray-600 cursor-pointer" title="تظليل">
+    <label class="flex items-center gap-1 text-xs text-[var(--muted)] cursor-pointer" title="تظليل">
       🖍️ <input type="color" data-highlight="${sid}" class="w-6 h-6 border-0 p-0 bg-transparent cursor-pointer" />
     </label>
-    <select class="text-xs border border-gray-300 rounded-lg px-1 py-1 bg-white" data-fontsize="${sid}">
+    <select class="text-xs rounded-lg px-1 py-1" data-fontsize="${sid}">
       <option value="" disabled selected>حجم الخط</option>
       <option value="2">صغير</option>
       <option value="3">عادي</option>
@@ -368,7 +528,7 @@ function toolbarHTML(sid) {
       <option value="5">كبير</option>
       <option value="6">كبير جداً</option>
     </select>
-    <span class="w-px h-6 bg-gray-300 mx-1"></span>
+    <span class="w-px h-6 bg-[var(--border)] mx-1"></span>
     <button class="toolbtn" data-cmd="undo" title="تراجع">↶</button>
     <button class="toolbtn" data-cmd="redo" title="إعادة">↷</button>
   </div>`;
@@ -378,14 +538,14 @@ function filePreviewHTML(f) {
   const inner = f.file_type === "image"
     ? `<img src="${esc(f.url)}" alt="${esc(f.name)}" class="w-28 h-20 object-cover" />`
     : f.file_type === "video"
-      ? `<div class="w-28 h-20 bg-gray-100 flex items-center justify-center text-gray-400 text-2xl">🎬</div>`
-      : `<div class="w-28 h-20 bg-gray-100 flex items-center justify-center text-gray-400 text-2xl">📄</div>`;
+      ? `<div class="w-28 h-20 bg-black/30 flex items-center justify-center text-[var(--muted)] text-2xl">🎬</div>`
+      : `<div class="w-28 h-20 bg-black/30 flex items-center justify-center text-[var(--muted)] text-2xl">📄</div>`;
   return `
-  <div class="relative group border border-gray-200 rounded-xl overflow-hidden w-28">
-    ${state.editMode ? `<button data-del-file="${f.id}" class="absolute top-1 left-1 bg-white/90 rounded-md p-1 text-gray-500 hover:text-red-500 z-10">🗑️</button>` : ""}
+  <div class="relative group border border-[var(--border)] rounded-xl overflow-hidden w-28 transition hover:border-[var(--accent)]">
+    ${state.editMode ? `<button data-del-file="${f.id}" class="absolute top-1 left-1 bg-black/60 backdrop-blur rounded-md p-1 text-[var(--muted)] hover:text-red-400 z-10 transition">🗑️</button>` : ""}
     <a href="${esc(f.url)}" target="_blank" rel="noreferrer" class="block">
       ${inner}
-      <p class="text-[10px] text-gray-500 px-1 py-1 truncate">${esc(f.name)}</p>
+      <p class="text-[10px] text-[var(--muted)] px-1 py-1 truncate">${esc(f.name)}</p>
     </a>
   </div>`;
 }
@@ -393,11 +553,12 @@ function filePreviewHTML(f) {
 function addNewSectionInline() {
   const container = document.getElementById("sections-list");
   const div = document.createElement("div");
-  div.className = "bg-white border border-indigo-200 rounded-xl p-4 flex gap-2 items-center";
+  div.className = "glass rounded-2xl p-4 flex gap-2 items-center pop-in";
+  div.style.borderColor = "var(--accent)";
   div.innerHTML = `
-    <input id="new-sec-title" autofocus placeholder="عنوان السيكشن الجديد" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-    <button id="new-sec-add" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm">إضافة</button>
-    <button id="new-sec-cancel" class="text-gray-400 hover:text-gray-600 px-2">✕</button>
+    <input id="new-sec-title" autofocus placeholder="عنوان السيكشن الجديد" class="flex-1 rounded-xl px-3 py-2.5" />
+    <button id="new-sec-add" class="btn-primary text-white rounded-xl px-4 py-2.5 text-sm">إضافة</button>
+    <button id="new-sec-cancel" class="text-[var(--muted)] hover:text-white px-2 transition">✕</button>
   `;
   container.prepend(div);
   document.getElementById("new-sec-title").focus();
@@ -450,7 +611,6 @@ function wireSectionEvents() {
     });
   });
 
-  // rich text editors
   document.querySelectorAll("[data-rte]").forEach(el => {
     const sid = el.getAttribute("data-rte");
     let saveTimer;
@@ -466,7 +626,6 @@ function wireSectionEvents() {
     });
   });
 
-  // toolbars
   document.querySelectorAll("[data-toolbar]").forEach(bar => {
     const sid = bar.getAttribute("data-toolbar");
     const rte = document.querySelector(`[data-rte="${sid}"]`);
@@ -481,25 +640,18 @@ function wireSectionEvents() {
     });
     const colorInput = bar.querySelector(`[data-color="${sid}"]`);
     if (colorInput) colorInput.addEventListener("input", () => {
-      rte.focus();
-      document.execCommand("foreColor", false, colorInput.value);
-      rte.dispatchEvent(new Event("input"));
+      rte.focus(); document.execCommand("foreColor", false, colorInput.value); rte.dispatchEvent(new Event("input"));
     });
     const hlInput = bar.querySelector(`[data-highlight="${sid}"]`);
     if (hlInput) hlInput.addEventListener("input", () => {
-      rte.focus();
-      document.execCommand("hiliteColor", false, hlInput.value);
-      rte.dispatchEvent(new Event("input"));
+      rte.focus(); document.execCommand("hiliteColor", false, hlInput.value); rte.dispatchEvent(new Event("input"));
     });
     const fsSelect = bar.querySelector(`[data-fontsize="${sid}"]`);
     if (fsSelect) fsSelect.addEventListener("change", () => {
-      rte.focus();
-      document.execCommand("fontSize", false, fsSelect.value);
-      rte.dispatchEvent(new Event("input"));
+      rte.focus(); document.execCommand("fontSize", false, fsSelect.value); rte.dispatchEvent(new Event("input"));
     });
   });
 
-  // file upload
   document.querySelectorAll("[data-upload-btn]").forEach(btn => {
     const sid = btn.getAttribute("data-upload-btn");
     const input = document.querySelector(`[data-upload-input="${sid}"]`);
@@ -517,9 +669,8 @@ function wireSectionEvents() {
         if (file.type.startsWith("image/")) fileType = "image";
         else if (file.type.startsWith("video/")) fileType = "video";
         await sb.from("kb_files").insert({ section_id: sid, url: pub.publicUrl, name: file.name, file_type: fileType });
-        await refreshSections();
         state.openIds.add(sid);
-        renderDetail();
+        await refreshSections();
       } else {
         alert("فشل رفع الملف: " + upErr.message);
         btn.innerHTML = "📎 إضافة صورة / فيديو / ملف";
@@ -530,10 +681,10 @@ function wireSectionEvents() {
   document.querySelectorAll("[data-del-file]").forEach(el => {
     el.addEventListener("click", async (e) => {
       e.preventDefault(); e.stopPropagation();
+      const sid = el.closest("[data-section]").getAttribute("data-section");
       await sb.from("kb_files").delete().eq("id", el.getAttribute("data-del-file"));
+      state.openIds.add(sid);
       await refreshSections();
-      state.openIds.add(el.closest("[data-section]").getAttribute("data-section"));
-      renderDetail();
     });
   });
 }
@@ -542,19 +693,19 @@ function wireSectionEvents() {
 function openPasswordModal(onSuccess) {
   const root = document.getElementById("modal-root");
   root.innerHTML = `
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative">
-      <button id="close-pw" class="absolute left-4 top-4 text-gray-400 hover:text-gray-600">✕</button>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in-fast">
+    <div class="glass rounded-3xl shadow-2xl w-full max-w-sm p-6 relative pop-in">
+      <button id="close-pw" class="absolute left-4 top-4 text-[var(--muted)] hover:text-white transition">✕</button>
       <div class="flex flex-col items-center text-center gap-3 mb-4">
-        <div class="bg-indigo-100 text-indigo-600 rounded-full p-3 text-xl">🔒</div>
-        <h2 class="text-lg font-bold text-gray-800">تفعيل وضع التعديل</h2>
-        <p class="text-sm text-gray-500">أدخل كلمة المرور للمتابعة</p>
+        <div class="rounded-full p-4 text-2xl btn-primary glow-icon">🔒</div>
+        <h2 class="text-lg font-bold grad-text">تفعيل وضع التعديل</h2>
+        <p class="text-sm text-[var(--muted)]">أدخل كلمة المرور للمتابعة</p>
       </div>
       <form id="pw-form" class="flex flex-col gap-3">
         <input id="pw-input" type="password" autofocus placeholder="••••"
-          class="border border-gray-300 rounded-xl px-4 py-2 text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-        <p id="pw-error" class="text-red-500 text-sm text-center hidden">الرمز غير صحيح، حاول مرة أخرى</p>
-        <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 font-semibold transition">دخول</button>
+          class="rounded-2xl px-4 py-3 text-center tracking-[0.3em] text-lg" />
+        <p id="pw-error" class="text-red-400 text-sm text-center hidden">الرمز غير صحيح، حاول مرة أخرى</p>
+        <button class="btn-primary text-white rounded-2xl py-2.5 font-semibold">دخول</button>
       </form>
     </div>
   </div>`;
@@ -566,7 +717,10 @@ function openPasswordModal(onSuccess) {
       root.innerHTML = "";
       onSuccess();
     } else {
-      document.getElementById("pw-error").classList.remove("hidden");
+      const err = document.getElementById("pw-error");
+      err.classList.remove("hidden");
+      const box = document.getElementById("pw-input");
+      box.animate([{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}], {duration:250});
     }
   });
 }
@@ -578,7 +732,6 @@ function render() {
   if (state.view === "detail") return renderDetail();
 }
 
-// نقطة الانطلاق
 if (state.view === "categories") {
   loadCategories();
 } else {
