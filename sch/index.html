@@ -11,15 +11,16 @@
     --bg:#0B0B0E;
     --surface:#18181D;
     --surface-2:#1F1F26;
+    --surface-3:#25252D;
     --ink:#F2F2F5;
     --ink-soft:#9A9AA6;
     --gold:#D8AD5C;
     --gold-soft:#3A311F;
     --teal:#D8AD5C;
     --teal-light:#CDEAE5;
-    --coral:#FF6F59;
-    --amber:#FFB238;
-    --violet:#8B7CF6;
+    --coral:#E8896F;
+    --amber:#E3B98C;
+    --violet:#B9AED9;
     --line:#2A2A32;
     --danger:#E0555B;
   }
@@ -129,13 +130,13 @@
   .day-title{font-weight:900;color:var(--gold);margin-bottom:8px;font-size:14px}
   .shift-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .shift-card{
-    border-radius:16px;padding:12px 14px;color:#1E2430;
+    border-radius:16px;padding:12px 14px;color:#211C12;
     border:1px solid rgba(0,0,0,.08);
     box-shadow:0 2px 8px rgba(0,0,0,.18);
   }
   .shift-card .time{font-weight:900;font-size:13px}
   .shift-card .who{font-size:13px;margin-top:4px;font-weight:700}
-  .shift-card .note{font-size:11px;color:#4b4b4b;margin-top:2px}
+  .shift-card .note{font-size:11px;color:#4b4436;margin-top:2px}
   .shift-card.open{border:1.5px dashed #6b6b76;background:var(--surface-2);color:var(--ink)}
   .shift-card.open .note{color:var(--ink-soft)}
   .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-inline-end:4px;margin-top:4px}
@@ -170,7 +171,36 @@
   .week-grid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto}
   .week-col{border:1px solid var(--line);border-radius:16px;padding:10px;background:var(--surface)}
   .week-col h4{margin:0 0 8px;font-size:13px;text-align:center;color:var(--gold)}
-  .week-shift{border-radius:10px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(0,0,0,.08);color:#1E2430}
+  .week-shift{border-radius:10px;padding:6px 8px;margin-bottom:6px;font-size:11px;border:1px solid rgba(0,0,0,.08);color:#211C12}
+
+  /* Settings tabs (redesigned admin) */
+  .settings-shell{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.28);margin-bottom:16px}
+  .settings-tabs{display:flex;gap:4px;overflow-x:auto;padding:12px 12px 0;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .settings-tab{
+    padding:10px 14px;border-radius:12px 12px 0 0;background:transparent;border:none;
+    color:var(--ink-soft);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;
+    white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .15s;
+  }
+  .settings-tab .num{
+    width:18px;height:18px;border-radius:50%;background:var(--surface-3);color:var(--ink-soft);
+    font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;
+  }
+  .settings-tab.active{background:var(--surface);color:var(--gold)}
+  .settings-tab.active .num{background:var(--gold);color:#1a1408}
+  .settings-body{padding:20px}
+  .settings-section{display:none}
+  .settings-section.active{display:block}
+  .section-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .section-icon{
+    width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;background:var(--gold-soft);flex-shrink:0;
+  }
+  .section-head-text h2{margin:0;font-size:16px;color:var(--gold);font-weight:900}
+  .section-head-text .section-sub{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .subcard{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px}
+  .subcard h3{margin:0 0 4px;font-size:14px;color:var(--ink);font-weight:900;display:flex;align-items:center;gap:6px}
+  .dirty-banner{background:var(--gold-soft);border:1px solid var(--gold);color:var(--gold);padding:10px 14px;border-radius:14px;margin-bottom:14px;font-weight:700;font-size:13px}
+  .settings-footer{display:flex;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line);background:var(--surface-2);gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -236,6 +266,7 @@ let state = {
   error: null,
   successMsg: null,
   dirty: false,
+  adminTab: 'general',
 };
 
 function emptySettings(){
@@ -248,12 +279,12 @@ function emptySettings(){
     startDate: '',
     endDate: '',
     shiftLabels: [
-      {id: uid('sl'), name:'الوردية الصباحية', color:'#CDEAE5'},
-      {id: uid('sl'), name:'الوردية المسائية', color:'#FFE3C2'},
-      {id: uid('sl'), name:'الوردية الليلية', color:'#E6DEFB'},
+      {id: uid('sl'), name:'الوردية الصباحية', color:'#E8D9B5'},
+      {id: uid('sl'), name:'الوردية المسائية', color:'#E3B98C'},
+      {id: uid('sl'), name:'الوردية الليلية', color:'#B9AED9'},
     ],
     labels: [
-      {id: uid('lb'), name:'ATM', color:'#FF6F59'},
+      {id: uid('lb'), name:'ATM', color:'#E8896F'},
     ]
   };
 }
@@ -264,7 +295,10 @@ async function loadAll(){
     state.settings = s ? s : emptySettings();
     if(!state.settings.shiftLabels) state.settings.shiftLabels = emptySettings().shiftLabels;
     if(!state.settings.labels) state.settings.labels = emptySettings().labels;
-    if(!state.settings.labelsNotes) state.settings.labelsNotes = '';
+    if(state.settings.generalNotes === undefined) state.settings.generalNotes = '';
+    if(state.settings.generalConditions === undefined) state.settings.generalConditions = '';
+    if(state.settings.breakNotes === undefined) state.settings.breakNotes = '';
+    if(state.settings.labelsNotes === undefined) state.settings.labelsNotes = '';
     (state.settings.employees||[]).forEach(e=>{ if(!e.color) e.color=''; });
   }catch(e){ state.settings = emptySettings(); state.error = 'تعذّر الاتصال بقاعدة البيانات: ' + e.message; }
   try{
@@ -406,97 +440,178 @@ function render(){
   }
 }
 
-// ---------- Admin panel (settings) ----------
+// ---------- Admin panel (settings) — tabbed, modern layout ----------
+const ADMIN_TABS = [
+  {id:'general', icon:'📅', title:'الفترة'},
+  {id:'employees', icon:'👥', title:'الموظفين'},
+  {id:'shifts', icon:'🎨', title:'الشيفتات والألوان'},
+  {id:'labels', icon:'🏷️', title:'الليبلات'},
+  {id:'ai', icon:'🤖', title:'ملاحظات AI'},
+  {id:'save', icon:'💾', title:'الحفظ والاستيراد'},
+];
+
 function renderAdmin(){
   const el = document.createElement('div');
 
   if(state.dirty){
     const banner = document.createElement('div');
-    banner.style.cssText = 'background:var(--gold-soft);border:1px solid var(--gold);color:var(--gold);padding:10px 14px;border-radius:14px;margin-bottom:12px;font-weight:700;font-size:13px';
-    banner.textContent = '⚠️ لديك تعديلات غير محفوظة — اضغط "حفظ الإعدادات" قبل مغادرة الصفحة أو الضغط على تحديث';
+    banner.className = 'dirty-banner';
+    banner.textContent = '⚠️ لديك تعديلات غير محفوظة — اضغط "حفظ الإعدادات" بتبويب "الحفظ والاستيراد" قبل مغادرة الصفحة أو الضغط على تحديث';
     el.appendChild(banner);
   }
 
-  // Employees card
-  const empCard = document.createElement('div');
-  empCard.className = 'card';
-  empCard.innerHTML = `<h2>👥 قائمة الموظفين</h2>
-    <div class="hint">لكل موظف لون خاص به — إذا اخترت لوناً له، هذا اللون يطغى على لون تسمية الشيفت بكل بطاقاته.</div>
-    <div id="empRows"></div>
-    <button class="btn btn-outline btn-sm" id="addEmpBtn">+ إضافة موظف</button>`;
-  el.appendChild(empCard);
-  const empRows = empCard.querySelector('#empRows');
-  renderEmpRows(empRows);
-  empCard.querySelector('#addEmpBtn').addEventListener('click', ()=>{
-    state.settings.employees.push({id:'', name:'', gender:'ذكر', note:'', color:''});
-    renderEmpRows(empRows);
-    markDirty();
+  const shell = document.createElement('div');
+  shell.className = 'settings-shell';
+
+  const tabsBar = document.createElement('div');
+  tabsBar.className = 'settings-tabs';
+  ADMIN_TABS.forEach((t,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'settings-tab' + (state.adminTab===t.id ? ' active' : '');
+    btn.innerHTML = `<span class="num">${i+1}</span><span>${t.icon} ${t.title}</span>`;
+    btn.addEventListener('click', ()=>{ state.adminTab = t.id; render(); });
+    tabsBar.appendChild(btn);
   });
+  shell.appendChild(tabsBar);
 
-  // Shift labels & colors card
-  const slCard = document.createElement('div');
-  slCard.className = 'card';
-  slCard.innerHTML = `<h2>🎨 تسميات الشيفتات وألوانها</h2>
-    <div class="hint">هذه هي الأسماء اللي تنكتب بحقل "الوصف/التسمية" لكل شيفت (مثال: الوردية الصباحية)، ولكل واحدة لون افتراضي — إذا الشيفت ما إله موظف بلون خاص، بينلبس هذا اللون.</div>
-    <div id="slRows"></div>
-    <button class="btn btn-outline btn-sm" id="addSlBtn">+ إضافة تسمية</button>`;
-  el.appendChild(slCard);
-  const slRows = slCard.querySelector('#slRows');
-  renderLabelListRows(slRows, state.settings.shiftLabels);
-  slCard.querySelector('#addSlBtn').addEventListener('click', ()=>{
-    state.settings.shiftLabels.push({id:uid('sl'), name:'', color:'#CDEAE5'});
-    renderLabelListRows(slRows, state.settings.shiftLabels);
-    markDirty();
-  });
+  const body = document.createElement('div');
+  body.className = 'settings-body';
+  body.appendChild(buildAdminSection(state.adminTab));
+  shell.appendChild(body);
 
-  // Extra labels (ATM etc.) card
-  const lbCard = document.createElement('div');
-  lbCard.className = 'card';
-  lbCard.innerHTML = `<h2>🏷️ ليبلات إضافية (مثل ATM)</h2>
-    <div class="hint">هذه ليبلات صغيرة تنضاف فوق أي شيفت (بغض النظر عن توزيع الموظف)، تظهر كشارة على بطاقة الشيفت. أضف "ATM" أو أي اسم آخر تريده.</div>
-    <div id="lbRows"></div>
-    <button class="btn btn-outline btn-sm" id="addLbBtn">+ إضافة ليبل</button>`;
-  el.appendChild(lbCard);
-  const lbRows = lbCard.querySelector('#lbRows');
-  renderLabelListRows(lbRows, state.settings.labels);
-  lbCard.querySelector('#addLbBtn').addEventListener('click', ()=>{
-    state.settings.labels.push({id:uid('lb'), name:'', color:'#8B7CF6'});
-    renderLabelListRows(lbRows, state.settings.labels);
-    markDirty();
-  });
-
-  // Date range
-  const dateCard = document.createElement('div');
-  dateCard.className = 'card';
-  dateCard.innerHTML = `
-    <h2>📅 الفترة الزمنية</h2>
-    <div class="row-2">
-      <div><label>من تاريخ</label><input type="date" id="startDate" value="${state.settings.startDate||''}"></div>
-      <div><label>إلى تاريخ</label><input type="date" id="endDate" value="${state.settings.endDate||''}"></div>
-    </div>`;
-  el.appendChild(dateCard);
-  dateCard.querySelector('#startDate').addEventListener('change', e=>{ state.settings.startDate = e.target.value; markDirty(); });
-  dateCard.querySelector('#endDate').addEventListener('change', e=>{ state.settings.endDate = e.target.value; markDirty(); });
-
-  // Three-part prompt/import card
-  el.appendChild(renderImportCard());
-
-  // Actions
-  const actionsCard = document.createElement('div');
-  actionsCard.className = 'card';
-  actionsCard.innerHTML = `
-    <h2>💾 الحفظ</h2>
-    <div class="toolbar">
-      <button class="btn btn-primary" id="saveBtn" ${state.saving?'disabled':''}>${state.saving?'<span class="loading"></span>جارِ الحفظ...':'حفظ الإعدادات'}</button>
-      <button class="btn btn-danger" id="clearScheduleBtn">🗑️ مسح الجدول كاملاً</button>
-    </div>
-    <div class="status" id="statusMsg" style="${state.error ? 'color:var(--danger);font-weight:700' : (state.successMsg ? 'color:var(--teal);font-weight:700' : '')}">${state.error ? '⚠️ '+esc(state.error) : (state.successMsg ? '✅ '+esc(state.successMsg) : '')}</div>
+  const footer = document.createElement('div');
+  footer.className = 'settings-footer';
+  footer.innerHTML = `
+    <div class="status" id="statusMsg" style="margin-inline-end:auto;align-self:center;${state.error ? 'color:var(--danger);font-weight:700' : (state.successMsg ? 'color:var(--teal);font-weight:700' : '')}">${state.error ? '⚠️ '+esc(state.error) : (state.successMsg ? '✅ '+esc(state.successMsg) : '')}</div>
+    <button class="btn btn-danger btn-sm" id="clearScheduleBtn">🗑️ مسح الجدول كاملاً</button>
+    <button class="btn btn-primary" id="saveBtn" ${state.saving?'disabled':''}>${state.saving?'<span class="loading"></span>جارِ الحفظ...':'💾 حفظ الإعدادات'}</button>
   `;
-  el.appendChild(actionsCard);
-  actionsCard.querySelector('#saveBtn').addEventListener('click', onSaveSettings);
-  actionsCard.querySelector('#clearScheduleBtn').addEventListener('click', onClearSchedule);
+  shell.appendChild(footer);
+  footer.querySelector('#saveBtn').addEventListener('click', onSaveSettings);
+  footer.querySelector('#clearScheduleBtn').addEventListener('click', onClearSchedule);
 
+  el.appendChild(shell);
   return el;
+}
+
+function sectionHead(icon, title, sub){
+  const wrap = document.createElement('div');
+  wrap.className = 'section-head';
+  wrap.innerHTML = `
+    <div class="section-icon">${icon}</div>
+    <div class="section-head-text">
+      <h2>${title}</h2>
+      <div class="section-sub">${sub}</div>
+    </div>`;
+  return wrap;
+}
+
+function buildAdminSection(tabId){
+  const section = document.createElement('div');
+  section.className = 'settings-section active';
+
+  if(tabId === 'general'){
+    section.appendChild(sectionHead('📅','الفترة الزمنية','حدد بداية ونهاية الفترة التي تريد جدولتها'));
+    const box = document.createElement('div');
+    box.className = 'subcard';
+    box.innerHTML = `
+      <div class="row-2">
+        <div><label>من تاريخ</label><input type="date" id="startDate" value="${state.settings.startDate||''}"></div>
+        <div><label>إلى تاريخ</label><input type="date" id="endDate" value="${state.settings.endDate||''}"></div>
+      </div>`;
+    section.appendChild(box);
+    box.querySelector('#startDate').addEventListener('change', e=>{ state.settings.startDate = e.target.value; markDirty(); });
+    box.querySelector('#endDate').addEventListener('change', e=>{ state.settings.endDate = e.target.value; markDirty(); });
+  }
+
+  else if(tabId === 'employees'){
+    section.appendChild(sectionHead('👥','قائمة الموظفين','لكل موظف لون خاص به — إذا اخترت لوناً له، هذا اللون يطغى على لون تسمية الشيفت بكل بطاقاته'));
+    const box = document.createElement('div');
+    box.className = 'subcard';
+    box.innerHTML = `<div id="empRows"></div><button class="btn btn-outline btn-sm" id="addEmpBtn">+ إضافة موظف</button>`;
+    section.appendChild(box);
+    const empRows = box.querySelector('#empRows');
+    renderEmpRows(empRows);
+    box.querySelector('#addEmpBtn').addEventListener('click', ()=>{
+      state.settings.employees.push({id:'', name:'', gender:'ذكر', note:'', color:''});
+      renderEmpRows(empRows);
+      markDirty();
+    });
+  }
+
+  else if(tabId === 'shifts'){
+    section.appendChild(sectionHead('🎨','تسميات الشيفتات وألوانها','هذه هي الأسماء التي تنكتب بحقل الوصف لكل شيفت، ولكل واحدة لون افتراضي يظهر إذا ما كان للموظف لون خاص'));
+    const box = document.createElement('div');
+    box.className = 'subcard';
+    box.innerHTML = `<div id="slRows"></div><button class="btn btn-outline btn-sm" id="addSlBtn">+ إضافة تسمية</button>`;
+    section.appendChild(box);
+    const slRows = box.querySelector('#slRows');
+    renderLabelListRows(slRows, state.settings.shiftLabels);
+    box.querySelector('#addSlBtn').addEventListener('click', ()=>{
+      state.settings.shiftLabels.push({id:uid('sl'), name:'', color:'#E8D9B5'});
+      renderLabelListRows(slRows, state.settings.shiftLabels);
+      markDirty();
+    });
+  }
+
+  else if(tabId === 'labels'){
+    section.appendChild(sectionHead('🏷️','ليبلات إضافية (مثل ATM)','ليبلات صغيرة تنضاف فوق أي شيفت كشارة، بغض النظر عن الموظف المسؤول'));
+    const box = document.createElement('div');
+    box.className = 'subcard';
+    box.innerHTML = `<div id="lbRows"></div><button class="btn btn-outline btn-sm" id="addLbBtn">+ إضافة ليبل</button>`;
+    section.appendChild(box);
+    const lbRows = box.querySelector('#lbRows');
+    renderLabelListRows(lbRows, state.settings.labels);
+    box.querySelector('#addLbBtn').addEventListener('click', ()=>{
+      state.settings.labels.push({id:uid('lb'), name:'', color:'#E8896F'});
+      renderLabelListRows(lbRows, state.settings.labels);
+      markDirty();
+    });
+  }
+
+  else if(tabId === 'ai'){
+    section.appendChild(sectionHead('🤖','ملاحظات وشروط توليد الجدول بالـAI','هذه الحقول تُستخدم مباشرة داخل البرومبتات التي تُولّد لكل خطوة (الشيفتات / البريكات / الليبلات)'));
+
+    const shiftsBox = document.createElement('div');
+    shiftsBox.className = 'subcard';
+    shiftsBox.innerHTML = `
+      <h3>🗓️ توزيع الشيفتات</h3>
+      <label>الملاحظات العامة</label>
+      <textarea id="generalNotes" placeholder="مثال: لا تجدول الموظف احمد يوم الجمعة">${esc(state.settings.generalNotes)}</textarea>
+      <label>الشروط العامة</label>
+      <textarea id="generalConditions" placeholder="مثال: كل شيفت 8 ساعات، موظف واحد فقط لكل شيفت">${esc(state.settings.generalConditions)}</textarea>
+      <div class="hint">تُدرج هذه الملاحظات والشروط كقواعد ملزمة داخل برومبت توزيع الشيفتات.</div>`;
+    section.appendChild(shiftsBox);
+    shiftsBox.querySelector('#generalNotes').addEventListener('input', e=>{ state.settings.generalNotes = e.target.value; markDirty(); });
+    shiftsBox.querySelector('#generalConditions').addEventListener('input', e=>{ state.settings.generalConditions = e.target.value; markDirty(); });
+
+    const breaksBox = document.createElement('div');
+    breaksBox.className = 'subcard';
+    breaksBox.innerHTML = `
+      <h3>☕ البريكات</h3>
+      <label>ملاحظات خاصة بالبريك</label>
+      <textarea id="breakNotes" placeholder="مثال: بريك الغداء يفضل يكون بعد الساعة 2 ظهراً">${esc(state.settings.breakNotes)}</textarea>
+      <div class="hint">تُستخدم عند توليد برومبت توزيع البريكات على الشيفتات الجاهزة.</div>`;
+    section.appendChild(breaksBox);
+    breaksBox.querySelector('#breakNotes').addEventListener('input', e=>{ state.settings.breakNotes = e.target.value; markDirty(); });
+
+    const labelsBox = document.createElement('div');
+    labelsBox.className = 'subcard';
+    labelsBox.innerHTML = `
+      <h3>🏷️ الليبلات (ATM وغيرها)</h3>
+      <label>ملاحظات خاصة بتوزيع الليبلات</label>
+      <textarea id="labelsNotes" placeholder="مثال: ليبل ATM يُضاف فقط على شيفتات الفترة الصباحية والمسائية">${esc(state.settings.labelsNotes)}</textarea>
+      <div class="hint">تُستخدم عند توليد برومبت توزيع الليبلات مثل ATM على الشيفتات الجاهزة.</div>`;
+    section.appendChild(labelsBox);
+    labelsBox.querySelector('#labelsNotes').addEventListener('input', e=>{ state.settings.labelsNotes = e.target.value; markDirty(); });
+  }
+
+  else if(tabId === 'save'){
+    section.appendChild(sectionHead('💾','توليد الجدول عبر AI والحفظ','ولّد برومبت كل خطوة، الصق رد الـAI، وطبّق التغييرات — ثم لا تنسَ حفظ الإعدادات من الأسفل'));
+    section.appendChild(renderImportCard());
+  }
+
+  return section;
 }
 
 function renderLabelListRows(container, list){
@@ -506,11 +621,11 @@ function renderLabelListRows(container, list){
     row.className = 'label-row';
     row.innerHTML = `
       <input type="text" placeholder="الاسم" value="${esc(item.name)}" data-f="name">
-      <input type="color" value="${item.color||'#CDEAE5'}" data-f="color">
+      <input type="color" value="${item.color||'#E8D9B5'}" data-f="color">
       <button class="btn btn-danger btn-sm" data-del>✕</button>
     `;
     row.querySelector('[data-f="name"]').addEventListener('input', e=>{ item.name = e.target.value; markDirty(); });
-    row.querySelector('[data-f="color"]').addEventListener('input', e=>{ item.color = e.target.value; markDirty(); render.__noop; });
+    row.querySelector('[data-f="color"]').addEventListener('input', e=>{ item.color = e.target.value; markDirty(); });
     row.querySelector('[data-del]').addEventListener('click', ()=>{
       list.splice(idx,1);
       renderLabelListRows(container, list);
@@ -533,7 +648,7 @@ function renderEmpRows(container){
         <option value="انثى" ${emp.gender==='انثى'?'selected':''}>انثى</option>
       </select>
       <input type="text" placeholder="ملاحظة" value="${esc(emp.note)}" data-f="note">
-      <input type="color" value="${emp.color||'#CDEAE5'}" data-f="color" title="لون خاص بالموظف">
+      <input type="color" value="${emp.color||'#E8D9B5'}" data-f="color" title="لون خاص بالموظف">
       <button class="btn btn-danger btn-sm" data-del>✕</button>
     `;
     row.querySelectorAll('input,select').forEach(inp=>{
@@ -706,9 +821,8 @@ ${JSON.stringify(summary)}
 
 function renderImportCard(){
   const card = document.createElement('div');
-  card.className = 'card';
+  card.className = 'subcard';
   card.innerHTML = `
-    <h2>📋 توليد الجدول عبر AI (3 خطوات مستقلة)</h2>
     <div class="hint">كل قسم مستقل تماماً — ما إنت مجبر تعبي الثلاثة. ولّد برومبت القسم، انسخه لأي AI (Claude/ChatGPT...)، والصق رده أو ارفعه كملف JSON، وبالنهاية زر واحد يطبّق كل شيء.</div>
 
     <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
@@ -733,7 +847,7 @@ function renderImportCard(){
 
     <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
     <h3>3️⃣ توزيع الليبلات (مثل ATM) على الشيفتات</h3>
-    <div class="hint">يحتاج أيضاً جدول شيفتات موجود مسبقاً. الليبلات المتاحة تدار من قسم "ليبلات إضافية" بالأعلى.</div>
+    <div class="hint">يحتاج أيضاً جدول شيفتات موجود مسبقاً. الليبلات المتاحة تدار من تبويب "الليبلات".</div>
     <button class="btn btn-outline btn-sm" id="genLabelsBtn" style="margin-top:6px">📋 توليد برومبت الليبلات</button>
     <textarea id="labelsImportBox" placeholder="الصق هنا رد الـ AI (JSON) الخاص بالليبلات، أو ارفع ملف/كود" style="min-height:110px;margin-top:8px;font-family:monospace;font-size:12px"></textarea>
     <div class="file-row">
@@ -947,7 +1061,7 @@ function concurrencyWarning(day, currentShiftId, brk){
 function empById(id){
   return (state.settings.employees||[]).find(e=>e.id===id);
 }
-const FALLBACK_COLORS = ['#CDEAE5','#FFE3C2','#E6DEFB','#FFD6D0','#D6ECFF'];
+const FALLBACK_COLORS = ['#E8D9B5','#E3B98C','#B9AED9','#D9C2A6','#A8C9C2'];
 function colorForLabel(label){
   let h=0; for(const c of (label||'')) h = (h*31 + c.charCodeAt(0))>>>0;
   return FALLBACK_COLORS[h % FALLBACK_COLORS.length];
@@ -965,8 +1079,8 @@ function labelDef(name){
 function tagBadges(shift){
   return (shift.tags||[]).map(t=>{
     const ld = labelDef(t);
-    const color = ld ? ld.color : '#8B7CF6';
-    return `<span class="badge" style="background:${color};color:#fff">${esc(t)}</span>`;
+    const color = ld ? ld.color : '#B9AED9';
+    return `<span class="badge" style="background:${color};color:#211C12">${esc(t)}</span>`;
   }).join('');
 }
 
@@ -1005,7 +1119,7 @@ function renderEmployeeView(){
 
   // Legend
   const legendCard = document.createElement('div');
-  legendCard.innerHTML = `<div class="legend"><span><i style="background:#CDEAE5"></i>شيفتات</span><span><i style="background:#F3F4F6;border:1px dashed #9CA3AF"></i>شيفت متاح (بدون موظف)</span></div>`;
+  legendCard.innerHTML = `<div class="legend"><span><i style="background:#E8D9B5"></i>شيفتات</span><span><i style="background:#F3F4F6;border:1px dashed #9CA3AF"></i>شيفت متاح (بدون موظف)</span></div>`;
   el.appendChild(legendCard);
 
   // Schedule days
@@ -1049,7 +1163,7 @@ function renderEmployeeView(){
           actionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); updateShift(s.shiftId, null); });
         } else if(!s.employeeId){
           actionBtn.textContent = 'أخذ هذا الشيفت';
-          actionBtn.style.background = 'var(--teal)'; actionBtn.style.color='#fff';
+          actionBtn.style.background = 'var(--teal)'; actionBtn.style.color='#1a1408';
           actionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); updateShift(s.shiftId, state.selectedEmployeeId); });
         }
         card.appendChild(actionBtn);
@@ -1280,7 +1394,7 @@ function showShiftEditModal(dayIdx, shiftId){
     const allLabels = state.settings.labels || [];
     box.innerHTML = allLabels.map(l=>{
       const active = localTags.includes(l.name);
-      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'transparent'};color:${active?'#fff':l.color}">${esc(l.name)}</span>`;
+      return `<span class="chip-tag" data-name="${esc(l.name)}" style="cursor:pointer;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid ${l.color};background:${active?l.color:'transparent'};color:${active?'#211C12':l.color}">${esc(l.name)}</span>`;
     }).join('') || '<div class="hint">لا توجد ليبلات معرّفة — أضفها من الإعدادات</div>';
     box.querySelectorAll('[data-name]').forEach(chip=>{
       chip.addEventListener('click', ()=>{
