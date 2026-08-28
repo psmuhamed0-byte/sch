@@ -183,6 +183,35 @@
   .week-col h4{margin:0 0 8px;font-size:13px;text-align:center;color:var(--gold)}
   .week-shift{border-radius:10px;padding:7px 9px;margin-bottom:6px;font-size:11px;border-top:2px solid rgba(255,255,255,.28);border-inline:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);color:var(--ink);box-shadow:0 3px 10px rgba(0,0,0,.3)}
 
+  /* Schedule view header + toggle */
+  .schedule-view-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+  .schedule-view-title{font-weight:900;color:var(--gold);font-size:16px;white-space:nowrap}
+  .view-toggle{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:4px}
+  .view-toggle-btn{
+    border:none;background:transparent;color:var(--ink-soft);font-family:inherit;font-weight:700;
+    font-size:12.5px;padding:8px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all .15s;
+  }
+  .view-toggle-btn.active{background:var(--gold);color:#1a1408}
+  .schedule-view-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* Employee x Day matrix view */
+  .matrix-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:14px}
+  .matrix-controls input[type=date]{width:auto;padding:7px 10px;font-size:13px}
+  .matrix-wrap{overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
+  .matrix-table{border-collapse:separate;border-spacing:0;width:100%;background:var(--surface)}
+  .matrix-table th, .matrix-table td{padding:10px 12px;text-align:center;border-bottom:1px solid var(--line);border-inline-start:1px solid var(--line);font-size:12px;white-space:nowrap}
+  .matrix-table tr:last-child td{border-bottom:none}
+  .matrix-table th{background:var(--surface-2);color:var(--gold);font-weight:900;font-size:12px}
+  .matrix-emp-head{text-align:right !important;position:sticky;inset-inline-start:0;z-index:2;border-inline-start:none !important}
+  .matrix-emp-cell{text-align:right;font-weight:800;color:#F3E4C6;background:var(--surface-2);position:sticky;inset-inline-start:0;border-inline-start:none !important;white-space:nowrap}
+  .matrix-cell-empty{color:var(--ink-soft);font-size:13px}
+  .matrix-chip{
+    display:inline-block;border-radius:10px;padding:6px 10px;color:var(--ink);
+    border-top:2px solid rgba(255,255,255,.28);box-shadow:0 3px 8px rgba(0,0,0,.3);
+    min-width:64px;
+  }
+  .matrix-chip-time{font-weight:900;font-size:11.5px;white-space:nowrap}
+
   /* Settings tabs (redesigned admin) */
   .settings-shell{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.28);margin-bottom:16px}
   .settings-tabs{display:flex;gap:4px;overflow-x:auto;padding:12px 12px 0;border-bottom:1px solid var(--line);background:var(--surface-2)}
@@ -275,7 +304,7 @@
     </div>
   </div>
   <div class="topbar-actions">
-    <button class="btn btn-ghost" id="weekViewBtn">عرض الأسبوع 🖼️</button>
+    <button class="btn btn-ghost" id="weekViewBtn">عرض الجدول 🖼️</button>
     <button class="btn btn-ghost" id="refreshBtn">تحديث ⟳</button>
     <button class="btn btn-ghost" id="settingsBtn">الإعدادات 🔒</button>
     <button class="btn btn-primary" id="shiftEditBtn">تعديل الصفحة 🔒</button>
@@ -360,6 +389,9 @@ let state = {
   shiftEditMode: false,
   weekView: false,
   weekIndex: 0,
+  scheduleViewMode: 'employee',
+  matrixStart: null,
+  matrixEnd: null,
   settings: null,
   schedule: null,
   selectedEmployeeId: null,
@@ -459,6 +491,11 @@ document.getElementById('weekViewBtn').addEventListener('click', ()=>{
   }
   state.weekView = true;
   state.weekIndex = 0;
+  if(!state.matrixStart || !state.matrixEnd){
+    const sortedDates = state.schedule.days.map(d=>d.date).sort();
+    state.matrixStart = sortedDates[0];
+    state.matrixEnd = sortedDates[Math.min(6, sortedDates.length-1)];
+  }
   render();
 });
 
@@ -1683,7 +1720,7 @@ function showDayEditModal(dayIdx){
   bg.querySelector('#dayEditClose').addEventListener('click', ()=>{ bg.remove(); render(); });
 }
 
-// ---------- Week view (Sat -> Fri, screenshot friendly) ----------
+// ---------- Schedule view (employee matrix + week view, screenshot friendly) ----------
 function satIndex(dateStr){
   const d = new Date(dateStr);
   return (d.getDay()+1)%7; // Sat=0 ... Fri=6
@@ -1707,12 +1744,133 @@ function renderWeekView(){
   overlay.className = 'week-overlay';
   overlay.id = 'weekOverlay';
 
-  const weeks = getWeeksFromSchedule(state.schedule);
-  if(weeks.length===0){
+  if(!state.schedule || !state.schedule.days || state.schedule.days.length===0){
     overlay.innerHTML = `<div class="card empty">لا يوجد بيانات لعرضها</div>
       <button class="btn btn-outline" id="closeWeekBtn">إغلاق</button>`;
     overlay.querySelector('#closeWeekBtn').addEventListener('click', ()=>{ state.weekView=false; render(); });
     return overlay;
+  }
+
+  const header = document.createElement('div');
+  header.className = 'schedule-view-header';
+  header.innerHTML = `
+    <div class="schedule-view-title">🗓️ عرض الجدول</div>
+    <div class="view-toggle">
+      <button class="view-toggle-btn ${state.scheduleViewMode==='employee'?'active':''}" data-view="employee">👤 حسب الموظف</button>
+      <button class="view-toggle-btn ${state.scheduleViewMode==='week'?'active':''}" data-view="week">📅 حسب الأسبوع</button>
+    </div>
+    <div class="schedule-view-actions">
+      <button class="btn btn-outline btn-sm" id="printWeekBtn">🖨️ طباعة</button>
+      <button class="btn btn-primary btn-sm" id="closeWeekBtn">إغلاق</button>
+    </div>`;
+  overlay.appendChild(header);
+  header.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.scheduleViewMode = btn.dataset.view; render(); });
+  });
+  header.querySelector('#printWeekBtn').addEventListener('click', ()=> window.print());
+  header.querySelector('#closeWeekBtn').addEventListener('click', ()=>{ state.weekView=false; render(); });
+
+  if(state.scheduleViewMode === 'employee'){
+    overlay.appendChild(renderEmployeeMatrixView());
+  } else {
+    overlay.appendChild(renderWeekGridView());
+  }
+
+  return overlay;
+}
+
+function renderEmployeeMatrixView(){
+  const wrap = document.createElement('div');
+
+  const sortedDates = state.schedule.days.map(d=>d.date).sort();
+  const minDate = sortedDates[0], maxDate = sortedDates[sortedDates.length-1];
+  if(!state.matrixStart) state.matrixStart = minDate;
+  if(!state.matrixEnd) state.matrixEnd = sortedDates[Math.min(6, sortedDates.length-1)];
+
+  const controls = document.createElement('div');
+  controls.className = 'matrix-controls';
+  controls.innerHTML = `
+    <span class="hint" style="margin:0">اختر الأيام التي تريد عرضها:</span>
+    <label style="margin:0">من</label>
+    <input type="date" id="matrixStartInput" value="${state.matrixStart}" min="${minDate}" max="${maxDate}">
+    <label style="margin:0">إلى</label>
+    <input type="date" id="matrixEndInput" value="${state.matrixEnd}" min="${minDate}" max="${maxDate}">
+  `;
+  wrap.appendChild(controls);
+  controls.querySelector('#matrixStartInput').addEventListener('change', e=>{ state.matrixStart = e.target.value; render(); });
+  controls.querySelector('#matrixEndInput').addEventListener('change', e=>{ state.matrixEnd = e.target.value; render(); });
+
+  const daysInRange = state.schedule.days
+    .filter(d => d.date >= state.matrixStart && d.date <= state.matrixEnd)
+    .sort((a,b)=> a.date.localeCompare(b.date));
+
+  if(daysInRange.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'card empty';
+    empty.textContent = 'لا توجد أيام ضمن هذا النطاق';
+    wrap.appendChild(empty);
+    return wrap;
+  }
+
+  const employees = state.settings.employees || [];
+  const tableWrap = document.createElement('div');
+  tableWrap.className = 'matrix-wrap';
+  const table = document.createElement('table');
+  table.className = 'matrix-table';
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  headRow.innerHTML = `<th class="matrix-emp-head">👤 الموظف</th>` + daysInRange.map(d=>{
+    const dateFmt = new Date(d.date).toLocaleDateString('ar-EG', { weekday:'short', month:'short', day:'numeric' });
+    return `<th>${dateFmt}</th>`;
+  }).join('');
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  employees.forEach(emp=>{
+    const row = document.createElement('tr');
+    let rowHtml = `<td class="matrix-emp-cell">${esc(emp.name || emp.id)}</td>`;
+    daysInRange.forEach(d=>{
+      const shifts = d.shifts.filter(s=> s.employeeId === emp.id).sort((a,b)=> a.start.localeCompare(b.start));
+      if(shifts.length===0){
+        rowHtml += `<td><span class="matrix-cell-empty">—</span></td>`;
+      } else {
+        const chips = shifts.map(s=>{
+          const bg = shiftColor(s) || '#3E6259';
+          const border = lightenColor(bg, 22);
+          return `<div class="matrix-chip" style="background:${bg};border-top-color:${border}">
+            <div class="matrix-chip-time">${s.start}-${s.end}</div>
+            ${(s.tags && s.tags.length) ? `<div class="tag-row" style="justify-content:center">${tagBadges(s)}</div>` : ''}
+          </div>`;
+        }).join('');
+        rowHtml += `<td>${chips}</td>`;
+      }
+    });
+    row.innerHTML = rowHtml;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+
+  if(employees.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'hint';
+    empty.style.marginTop = '10px';
+    empty.textContent = 'لا يوجد موظفون مضافون بعد';
+    wrap.appendChild(empty);
+  }
+
+  return wrap;
+}
+
+function renderWeekGridView(){
+  const wrap = document.createElement('div');
+  const weeks = getWeeksFromSchedule(state.schedule);
+  if(weeks.length===0){
+    wrap.innerHTML = `<div class="card empty">لا يوجد بيانات لعرضها</div>`;
+    return wrap;
   }
   if(state.weekIndex >= weeks.length) state.weekIndex = 0;
   const week = weeks[state.weekIndex];
@@ -1728,16 +1886,16 @@ function renderWeekView(){
     columns.push({dateStr, dayName: dayNames[i], dayData});
   }
 
-  const header = document.createElement('div');
-  header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px';
-  header.innerHTML = `
-    <div style="font-weight:900;color:var(--teal);font-size:16px">🗓️ عرض الأسبوع (سبت → جمعة) — جاهز للسكرين شوت</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${weeks.length>1 ? `<select id="weekPicker">${weeks.map((w,i)=>`<option value="${i}" ${i===state.weekIndex?'selected':''}>الأسبوع ${i+1} (${w.weekStart})</option>`).join('')}</select>` : ''}
-      <button class="btn btn-outline btn-sm" id="printWeekBtn">🖨️ طباعة</button>
-      <button class="btn btn-primary btn-sm" id="closeWeekBtn">إغلاق</button>
-    </div>`;
-  overlay.appendChild(header);
+  if(weeks.length>1){
+    const picker = document.createElement('div');
+    picker.style.cssText = 'margin-bottom:12px';
+    picker.innerHTML = `<select id="weekPicker" style="width:auto;display:inline-block">${weeks.map((w,i)=>`<option value="${i}" ${i===state.weekIndex?'selected':''}>الأسبوع ${i+1} (${w.weekStart})</option>`).join('')}</select>`;
+    wrap.appendChild(picker);
+    picker.querySelector('#weekPicker').addEventListener('change', e=>{
+      state.weekIndex = +e.target.value;
+      render();
+    });
+  }
 
   const grid = document.createElement('div');
   grid.className = 'week-grid';
@@ -1766,18 +1924,8 @@ function renderWeekView(){
     }
     grid.appendChild(colEl);
   });
-  overlay.appendChild(grid);
-
-  if(weeks.length>1){
-    header.querySelector('#weekPicker').addEventListener('change', e=>{
-      state.weekIndex = +e.target.value;
-      render();
-    });
-  }
-  header.querySelector('#printWeekBtn').addEventListener('click', ()=> window.print());
-  header.querySelector('#closeWeekBtn').addEventListener('click', ()=>{ state.weekView=false; render(); });
-
-  return overlay;
+  wrap.appendChild(grid);
+  return wrap;
 }
 
 function esc(str){
